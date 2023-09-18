@@ -1,0 +1,66 @@
+/* Navbar.css */
+
+.navbar {
+    background-color: #333; /* Change the background color as needed */
+    color: white;
+    padding: 10px 0;
+  }
+  
+  .navbar__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px; /* Adjust as needed */
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  .navbar__left {
+    display: flex;
+  }
+  
+  .navbar__link {
+    color: white;
+    text-decoration: none;
+    margin-right: 20px; /* Adjust spacing between links */
+    font-weight: bold;
+    transition: color 0.3s ease; /* Add a smooth color transition effect */
+  }
+  
+  .navbar__link:hover {
+    color: #ff6600; /* Change the hover color as desired */
+  }
+  
+  .navbar__right {
+    display: flex;
+  }
+  
+  /* Style the Profile and Logout links differently on the right side */
+  .navbar__right .navbar__link {
+    margin-right: 10px; /* Adjust spacing between links */
+    font-weight: normal; /* Remove bold styling */
+  }
+  
+  /* Add styles for the Profile and Logout buttons */
+  /* You can customize the button styles further if needed */
+  .navbar__right .navbar__link.button {
+    background-color: #ff6600; /* Button background color */
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+  }
+  
+  .navbar__right .navbar__link.button:hover {
+    background-color: #e65c00; /* Change the hover color as desired */
+  }
+  
+  /* Center the navbar links */
+  .navbar__left, .navbar__right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+  
