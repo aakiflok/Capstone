@@ -48,6 +48,42 @@ const ProductView: React.FC = () => {
     return <div>Loading...</div>;
   }
 
+  // Function to upload an image
+  const uploadImage = async (imageFile:any) => {
+    try {
+      // Create a FormData object to send the file
+      const formData = new FormData();
+      formData.append('image', imageFile);
+      
+      // Make a POST request to the /upload endpoint
+      const response = await axios.post('http://localhost:3001/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Set the content type to multipart/form-data
+        },
+      });
+
+      // Handle the response
+      if (response.status === 201) {
+        console.log('Image uploaded successfully.');
+        console.log('Image URL:', response.data.imageUrl);
+      } else {
+        console.error('Error uploading image:', response.data.message);
+      }
+    } catch (error) {
+      console.error('API error:', error);
+    }
+  };
+
+  // Usage example: call uploadImage with the selected file from an input field
+  
+  const handleImageUpload = async (event:any) => {
+    const selectedFile = event.target.files[0];
+  
+    if (selectedFile) {
+      await uploadImage(selectedFile);
+    }
+  };
+  
   const handleSubmitMessage = async () => {
     try {
       const response = await axios.post(`http://localhost:3001/products/${id}/messages/${user.id}`, {
@@ -78,7 +114,7 @@ const ProductView: React.FC = () => {
             <p className="description">{product.description}</p>
           </div>
         </div>
-  
+        <input type="file" accept="image/*" onChange={handleImageUpload} />
         {/* List of messages */}
         <div className="message-list">
           {messages.map((message) => (

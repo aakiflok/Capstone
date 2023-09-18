@@ -3,6 +3,40 @@ import { Product } from './../models/ProductModel';
 import { Stock } from './../models/StockModel';
 
 const router = express.Router();
+const azure = require('azure-storage');
+const blobService = azure.createBlobService('posproject', 'KYTgOoFQL+ZtpAnfQFOi3waffpKAw5Zc4KeSrXH/hIqtdjzirdjo02iWZu2w1lvfQcFyUqTYB6ZE+ASt+RkWwg==');
+const multer = require('multer');
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+
+router.post('/upload', upload.single('image'), async (req: any, res) => {
+  try {
+    const containerName = 'posproject'; // Replace with your container name
+    const blobName = req.file.originalname;
+
+    const buffer = req.file.buffer;
+
+    blobService.createBlockBlobFromText(
+      containerName,
+      blobName,
+      buffer,
+      buffer.length,
+      (error :any, _result :any, response :Response) => {
+        if (!error) {
+          const imageUrl = blobService.getUrl(containerName, blobName);
+          res.status(201).json({ imageUrl });
+        } else {
+          res.status(500).json({ message: 'Error uploading image to Azure Blob Storage' });
+        }
+      }
+    );
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 
 // Get all products
 router.get('/products', async (req: Request, res: Response) => {
