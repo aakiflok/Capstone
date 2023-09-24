@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import './productView.css';
 import Navbar from '../../navigation/nav';
 import axios from 'axios';
@@ -114,6 +114,12 @@ const ProductView: React.FC = () => {
             <p className="description">{product.description}</p>
           </div>
         </div>
+        <Link
+            to={`/editProduct/${product.id}`} // Pass the productId as a URL parameter
+            key={product.id}
+          >
+          <button className="add-product-button">Add Product</button>
+        </Link>
         <input type="file" accept="image/*" onChange={handleImageUpload} />
         {/* List of messages */}
         <div className="message-list">

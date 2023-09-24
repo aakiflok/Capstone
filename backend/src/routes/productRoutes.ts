@@ -5,37 +5,71 @@ import { Stock } from './../models/StockModel';
 const router = express.Router();
 const azure = require('azure-storage');
 const blobService = azure.createBlobService('posproject', 'KYTgOoFQL+ZtpAnfQFOi3waffpKAw5Zc4KeSrXH/hIqtdjzirdjo02iWZu2w1lvfQcFyUqTYB6ZE+ASt+RkWwg==');
+console.log(blobService);
 const multer = require('multer');
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+router.post('/products', async (req: Request, res: Response) => {
+  try {
+    // Get product data from the request body
+    const { id, name, price, category, description, image_uri } = req.body;
+
+    // Create a new product instance
+    const newProduct = new Product({
+      id,
+      name,
+      price,
+      category,
+      description,
+      image_uri,
+    });
+
+    // Save the new product to the database
+    const savedProduct = await newProduct.save();
+
+    res.status(201).json(savedProduct);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 router.post('/upload', upload.single('image'), async (req: any, res) => {
   try {
-    const containerName = 'posproject'; // Replace with your container name
+    const containerName = 'productStorage'; // Replace with your container name
     const blobName = req.file.originalname;
-
     const buffer = req.file.buffer;
 
-    blobService.createBlockBlobFromText(
-      containerName,
-      blobName,
-      buffer,
-      buffer.length,
-      (error :any, _result :any, response :Response) => {
-        if (!error) {
-          const imageUrl = blobService.getUrl(containerName, blobName);
-          res.status(201).json({ imageUrl });
-        } else {
-          res.status(500).json({ message: 'Error uploading image to Azure Blob Storage' });
-        }
+    // Check if the container exists, and create it if not
+    blobService.createContainerIfNotExists(containerName, { publicAccessLevel: 'blob' }, (createError: any) => {
+      if (!createError) {
+        // Container either exists or was successfully created
+
+        // Upload the blob to the container
+        blobService.createBlockBlobFromText(
+          containerName,
+          blobName,
+          buffer,
+          buffer.length,
+          (uploadError: any, _result: any, _response: Response) => {
+            if (!uploadError) {
+              const imageUrl = blobService.getUrl(containerName, blobName);
+              res.status(201).json({ imageUrl });
+            } else {
+              res.status(500).json({ error: uploadError });
+            }
+          }
+        );
+      } else {
+        res.status(500).json({ error: createError });
       }
-    );
+    });
   } catch (error) {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
 
 
 // Get all products

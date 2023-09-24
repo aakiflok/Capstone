@@ -12,6 +12,9 @@ import Products from "./components/products";
 import Profile from "./components/profile";
 import ProductView from "./components/itemView/productView/productView";
 import Inventory from "./components/inventory";
+import InventoryView from "./components/itemView/inventoryView/inventoryView";
+import Customers from "./components/customers";
+import AddEditProductForm from "./components/forms/addEditProductForm";
 
 
 const AppContainer = styled.div`
@@ -38,6 +41,12 @@ function App() {
         <Route path="/product/:id" element={<RequireAuth loginPath="/login"><ProductView /></RequireAuth>}/>       
         <Route path="/profile" element={<RequireAuth loginPath="/login"><Profile /></RequireAuth>}/>
         <Route path="/inventory" element={<RequireAuth loginPath="/login"><Inventory /></RequireAuth>}/>
+        <Route path="/customers" element={<RequireAuth loginPath="/login"><Customers /></RequireAuth>}/>
+        <Route path="/inventory/:id" element={<RequireAuth loginPath="/login"><InventoryView /></RequireAuth>}/>
+        <Route path="/addProduct" element={<RequireAuth loginPath="/login"><AddEditProductForm /></RequireAuth>}/>
+        <Route path="/editProduct/:id" element={<RequireAuth loginPath="/login"><AddEditProductForm /></RequireAuth>}/>
+
+        
       </Routes>
     </AppContainer>
   );
