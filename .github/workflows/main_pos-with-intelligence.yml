@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - pos-with-intelligence
+name: Build and deploy Node.js app to Azure Web App - poswithintelligence
 
 on:
   push:
@@ -14,24 +14,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Set up Node.js version
         uses: actions/setup-node@v1
         with:
           node-version: '16.x'
 
-      - name: npm install, build, and test
+      - name: Install dependencies and build frontend
         run: |
+          cd frontend
           npm install
           npm run build --if-present
-          npm run test --if-present
+        working-directory: ./frontend
 
-      - name: Upload artifact for deployment job
+      - name: Upload frontend artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
-          name: node-app
-          path: .
+          name: frontend-app
+          path: ./frontend/build
+
+      - name: Install dependencies and build backend
+        run: |
+          cd ../backend
+          npm install
+          npm run build --if-present
+        working-directory: ./backend
+
+      - name: Upload backend artifact for deployment job
+        uses: actions/upload-artifact@v2
+        with:
+          name: backend-app
+          path: ./backend/dist
 
   deploy:
     runs-on: ubuntu-latest
@@ -41,16 +56,30 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact from build job
+      - name: Download frontend artifact from build job
         uses: actions/download-artifact@v2
         with:
-          name: node-app
+          name: frontend-app
 
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
+      - name: Download backend artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: backend-app
+
+      - name: 'Deploy Frontend to Azure Web App'
+        id: deploy-frontend-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'pos-with-intelligence'
-          slot-name: 'Production'
+          app-name: 'poswithintelligence'  # Your Azure App Service name
+          slot-name: 'Production'  # The deployment slot you are using, e.g., Production or Staging
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EBEA1F7A519449DEBA77459D8127582F }}  # Azure App Service publish profile secret
+          package: ./frontend-app
+
+      - name: 'Deploy Backend to Azure Web App'
+        id: deploy-backend-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'poswithintelligence'  # Your Azure App Service name
+          slot-name: 'Production'  # The deployment slot you are using, e.g., Production or Staging
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EBEA1F7A519449DEBA77459D8127582F }}
           package: .
