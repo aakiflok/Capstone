@@ -24,7 +24,7 @@ jobs:
 
       - name: Install dependencies and build frontend
         run: |
-          cd frontend
+          cd frontend/pos-with-intelligence
           cd pos-with-intelligence
           npm install
           npm run build --if-present
