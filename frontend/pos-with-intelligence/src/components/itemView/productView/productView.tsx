@@ -118,7 +118,7 @@ const ProductView: React.FC = () => {
             to={`/editProduct/${product.id}`} // Pass the productId as a URL parameter
             key={product.id}
           >
-          <button className="add-product-button">Add Product</button>
+          <button className="add-product-button">Edit Product</button>
         </Link>
         <input type="file" accept="image/*" onChange={handleImageUpload} />
         {/* List of messages */}

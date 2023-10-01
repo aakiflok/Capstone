@@ -54,6 +54,7 @@ h2 {
   margin-bottom: 10px;
   background-color: #f7f7f7;
   width: 100%;
+  min-height: 30%;
   flex: 1;
   overflow: auto;
 }

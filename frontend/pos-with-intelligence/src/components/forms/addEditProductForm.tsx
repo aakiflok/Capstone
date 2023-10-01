@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../navigation/nav';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-
+import './addEditProductForm.css'; 
 const AddEditProductForm = () => {
   const { id } = useParams(); // Get the product ID from the route params
   const isEditing = !!id; // Determine if it's an edit operation
@@ -138,11 +138,6 @@ const AddEditProductForm = () => {
               required
             />
           </div>
-          <button type="submit" className="submit-button">
-            Add Product
-          </button>
-
-
           <button type="submit" className="submit-button">
             {isEditing ? 'Update Product' : 'Add Product'}
           </button>
