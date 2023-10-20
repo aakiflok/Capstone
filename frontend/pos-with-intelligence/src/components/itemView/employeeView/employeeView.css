@@ -1,0 +1,28 @@
+/* Add this CSS to your stylesheet or as a separate CSS file */
+
+.employee-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+    margin-top: 20px;
+  }
+  
+  .employee-table th, .employee-table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+  }
+  
+  .employee-table th {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .employee-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .employee-table tr:nth-child(odd) {
+    background-color: #fff;
+  }
+  

@@ -50,6 +50,26 @@ router.patch('/stock/:stock_id', async (req: Request, res: Response) => {
   }
 });
 
+//get quantity
+router.get('/stock/quantity/:product_id', async (req: Request, res: Response) => {
+  try {
+    const product_id = req.params.product_id;
+    
+    // Find the stock record with the given product_id
+    const stock = await Stock.findOne({ product_id });
+
+    if (!stock) {
+      return res.status(404).json({ message: 'Stock record not found' });
+    }
+
+    // Return only the quantity
+    res.status(200).json({ quantity: stock.quantity });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
 // Delete a stock record
 router.delete('/stock/:stock_id', async (req: Request, res: Response) => {
   try {

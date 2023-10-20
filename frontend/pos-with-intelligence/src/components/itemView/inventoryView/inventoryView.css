@@ -1,0 +1,76 @@
+/* InventoryView.css */
+ 
+  .inventory-content {
+    padding: '20px';
+    width: '100%'; 
+    display: 'flex';
+    justify-content: 'center'; 
+  }
+  
+  .inventory-details {
+    max-width: '800px'; 
+    width: '100%';
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+  
+  .inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+    margin-top: 20px;
+  }
+  
+  .inventory-table td, .inventory-table th {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+  }
+  
+  /* Add styling for the edit and delete buttons */
+  .inventory-form {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .inventory-form a {
+    text-decoration: none;
+  }
+  
+  .inventory-form button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .edit-button {
+    padding: '10px 20px'; 
+    background: '#007bff'; color: '#fff'; border: 'none'; 
+    border-radius: '5px'; cursor: 'pointer'; font-size: '16px'
+  }
+  
+   .delete-button {
+    background: red;
+    color: #fff;
+  }
+
+  
+  .inventory-table th {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .inventory-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .inventory-table tr:nth-child(odd) {
+    background-color: #fff;
+  }
+  

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../navigation/nav';
-import {useNavigate } from 'react-router-dom';
-
+import './customers.css'
+import { useNavigate } from 'react-router-dom';
 
 const Customers: React.FC = () => {
   const [customerList, setCustomerList] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState<any>(null); // State to hold the selected product
-  const navigate = useNavigate ();
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const navigate = useNavigate();
   useEffect(() => {
     fetchData();
   }, []);
@@ -21,22 +21,22 @@ const Customers: React.FC = () => {
     }
   };
 
-  const handleViewClick = (stock: any) => {
-    setSelectedProduct(stock); 
-    navigate(`/inventory/${stock.product_id}`);
+  const handleViewClick = (customer: any) => {
+    setSelectedCustomer(customer);
+    navigate(`/customers/${customer.customer_id}`);
   };
 
   const closeModal = () => {
-    setSelectedProduct(null); // Close the modal
+    setSelectedCustomer(null);
   };
 
   return (
     <>
-      <Navbar></Navbar>
-      <div className="inventory-container">
+      <Navbar />
+      <div className="customers-container">
         <div className="content">
           <h2>Customer Content</h2>
-          <table>
+          <table className="customer-table">
             <thead>
               <tr>
                 <th>Customer ID</th>
@@ -48,6 +48,7 @@ const Customers: React.FC = () => {
                 <th>Phone Number</th>
                 <th>State</th>
                 <th>Zip Code</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>

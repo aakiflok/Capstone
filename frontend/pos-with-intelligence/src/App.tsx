@@ -15,6 +15,9 @@ import Inventory from "./components/inventory";
 import InventoryView from "./components/itemView/inventoryView/inventoryView";
 import Customers from "./components/customers";
 import AddEditProductForm from "./components/forms/addEditProductForm";
+import Employees from "./components/employees";
+import EmployeeView from "./components/itemView/employeeView/employeeView";
+import CustomerView from "./components/itemView/customerView/customerView";
 
 
 const AppContainer = styled.div`
@@ -41,11 +44,13 @@ function App() {
         <Route path="/product/:id" element={<RequireAuth loginPath="/login"><ProductView /></RequireAuth>}/>       
         <Route path="/profile" element={<RequireAuth loginPath="/login"><Profile /></RequireAuth>}/>
         <Route path="/inventory" element={<RequireAuth loginPath="/login"><Inventory /></RequireAuth>}/>
+        <Route path="/employees" element={<RequireAuth loginPath="/login"><Employees /></RequireAuth>}/>
         <Route path="/customers" element={<RequireAuth loginPath="/login"><Customers /></RequireAuth>}/>
+        <Route path="/customers/:id" element={<RequireAuth loginPath="/login"><CustomerView /></RequireAuth>}/>
+        <Route path="/employees/:id" element={<RequireAuth loginPath="/login"><EmployeeView /></RequireAuth>}/>
         <Route path="/inventory/:id" element={<RequireAuth loginPath="/login"><InventoryView /></RequireAuth>}/>
         <Route path="/addProduct" element={<RequireAuth loginPath="/login"><AddEditProductForm /></RequireAuth>}/>
         <Route path="/editProduct/:id" element={<RequireAuth loginPath="/login"><AddEditProductForm /></RequireAuth>}/>
-
         
       </Routes>
     </AppContainer>

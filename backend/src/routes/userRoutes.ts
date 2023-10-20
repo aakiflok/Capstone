@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { User } from './../models/UserModel';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
@@ -26,8 +27,19 @@ router.get('/users', async (req: Request, res: Response) => {
 });
 
 // Get a specific user
-router.get('/users/:id', getUser, (req: Request, res: Response) => {
-  res.status(200).json(res.locals.user);
+router.get('/users/:id', getUser, async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(new mongoose.Types.ObjectId(userId));
+
+    if (!user) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 // Update a user

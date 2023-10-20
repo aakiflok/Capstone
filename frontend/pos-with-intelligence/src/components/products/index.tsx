@@ -4,12 +4,14 @@ import ProductTile from '../tiles/productTiles/productTile';
 import ProductView from '../itemView/productView/productView';
 import Navbar from '../navigation/nav';
 import axios from 'axios';
-import './index.css';
+import './index.css'; // You can create an external CSS file and import it here
 import { Product } from '../../models/product.module';
+import Cookies from 'js-cookie';
 
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [user, setUser] = useState<any | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -22,6 +24,14 @@ const Products = () => {
     };
 
     fetchProducts();
+
+    const token = Cookies.get('_auth');
+    const authState = Cookies.get('_auth_state');
+
+    if (token && authState) {
+      const userData = JSON.parse(authState);
+      setUser(userData.user);
+    }
   }, []);
 
   const openProductView = (product: Product) => {
@@ -36,9 +46,13 @@ const Products = () => {
     <>
       <Navbar />
       <div className="product-list">
-      <Link to="/addProduct"> {/* Link to the product form route */}
-          <button className="add-product-button">Add Product</button>
-        </Link>
+        {user && user.role === 'admin' && (
+          <Link to="/addProduct" className="product-tile-link">
+            <button className="add-product-button">Add Product</button>
+          </Link>
+        )}
+        
+        <div className="product-tiles-container">
         {products.map((product) => (
           <Link
             to={`/product/${product.id}`} // Pass the productId as a URL parameter
@@ -51,6 +65,7 @@ const Products = () => {
             />
           </Link>
         ))}
+        </div>
       </div>
     </>
   );

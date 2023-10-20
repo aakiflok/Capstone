@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from 'axios'; // Import Axios
 import Navbar from '../navigation/nav';
-import {useNavigate } from 'react-router-dom';
+import './inventory.css';
+import { useNavigate } from 'react-router-dom';
 
 const Inventory: React.FC = () => {
   const [stockList, setStockList] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState<any>(null); // State to hold the selected product
-  const navigate = useNavigate ();
+  const navigate = useNavigate();
+
   useEffect(() => {
     fetchStockData();
   }, []);
 
   const fetchStockData = async () => {
     try {
+      // Make a GET request to the '/stock' route
       const response = await axios.get('http://localhost:3001/stock');
       setStockList(response.data);
     } catch (error) {
@@ -21,7 +24,7 @@ const Inventory: React.FC = () => {
   };
 
   const handleViewClick = (stock: any) => {
-    setSelectedProduct(stock); 
+    setSelectedProduct(stock);
     navigate(`/inventory/${stock.product_id}`);
   };
 
@@ -35,7 +38,7 @@ const Inventory: React.FC = () => {
       <div className="inventory-container">
         <div className="content">
           <h2>Inventory Content</h2>
-          <table>
+          <table className="stock-table">
             <thead>
               <tr>
                 <th>Product ID</th>
