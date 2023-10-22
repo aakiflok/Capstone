@@ -95,7 +95,11 @@ router.post('/users/login', async (req: Request, res: Response) => {
     }
 
     // Generate a JWT token
-    const token = jwt.sign({ user: user }, 'capstone', { expiresIn: '1h' });
+    const jwtToken = process.env.JWT_TOKEN;
+    if (!jwtToken) {
+      return res.status(500).json({ message: 'JWT_TOKEN environment variable not set' });
+    }
+    const token = jwt.sign({ user: user }, jwtToken, { expiresIn: '1h' });
     res.cookie('loggedUser', token, { httpOnly: true });
     res.status(200).json({ user, token });
   } catch (err: any) {
