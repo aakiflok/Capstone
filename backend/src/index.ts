@@ -1,11 +1,9 @@
 import mongoose from 'mongoose';
-
 import { app } from './app';
-
+require('dotenv').config();
 async function start() {
   try {
-    const url =
-      'mongodb+srv://aakiflok:Ao9Y4YdcGEHsZXFv@cluster.wipvufy.mongodb.net/?retryWrites=true&w=majority';
+    const url = process.env.MONGODB_URI_CONNECTION_STRING || "";
 
     try {
       await mongoose.connect(url);
@@ -14,7 +12,7 @@ async function start() {
       console.error(err);
     }
 
-    app.listen(3001, () => {
+    app.listen(process.env.PORT, () => {
       console.log('app listening to 3001');
     });
   } catch {}
