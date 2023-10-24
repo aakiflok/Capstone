@@ -16,15 +16,14 @@ const AddEditEmployeeForm = () => {
     birthdate: '',
     address: '',
     username: '',
-    password: '', // Make sure this is handled securely as it's sensitive information
+    password: '',
     email: '',
     role: '',
-    joining_date: '', // This can also be automatically set on the server when creating an employee
+    joining_date: '',
   });
 
   useEffect(() => {
     if (isEditing) {
-      // Make sure to replace with your actual API endpoint
       axios.get(`https://pos-crud.onrender.com/users/${id}`)
         .then((response) => {
           setEmployee(response.data);
@@ -46,10 +45,8 @@ const AddEditEmployeeForm = () => {
   const handleSubmit = (e: any) => {
     e.preventDefault();
 
-    const apiUrl = 'https://pos-crud.onrender.com/users'; // Replace with your actual API endpoint
-
     if (isEditing) {
-      axios.put(`${apiUrl}/${id}`, employee)
+      axios.put(`https://pos-crud.onrender.com/updateUser/${id}`, employee)
         .then((response) => {
           console.log('Employee updated:', response.data);
         })
@@ -57,7 +54,7 @@ const AddEditEmployeeForm = () => {
           console.error('Error updating employee:', error);
         });
     } else {
-      axios.post(apiUrl, employee)
+      axios.post('https://pos-crud.onrender.com/addUser', employee)
         .then((response) => {
           console.log('Employee added:', response.data);
         })

@@ -98,29 +98,26 @@ router.get('/products/:id', async (req: Request, res: Response) => {
   }
 });
 
-
 // Update a product
 router.patch('/products/:id', async (req: Request, res: Response) => {
   try {
+    const { name, price, category, description, image_uri } = req.body;
+
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Update the product fields
-    if (req.body.name !== undefined) {
-      product.name = req.body.name;
-    }
-    if (req.body.price !== undefined) {
-      product.price = req.body.price;
-    }
-    if (req.body.category !== undefined) {
-      product.category = req.body.category;
-    }
-    // Update other fields similarly
+    // Update product properties
+    if (name) product.name = name;
+    if (price) product.price = price;
+    if (category) product.category = category;
+    if (description) product.description = description;
+    if (image_uri) product.image_uri = image_uri;
 
-    const updatedProduct = await product.save();
-    res.status(200).json(updatedProduct);
+    await product.save(); // save the changes to the database
+
+    res.status(200).json(product);
   } catch (err: any) {
     res.status(400).json({ message: err.message });
   }
