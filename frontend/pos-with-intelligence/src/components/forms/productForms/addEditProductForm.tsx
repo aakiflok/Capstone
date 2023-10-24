@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '../navigation/nav';
+import Navbar from '../../navigation/nav';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import './addEditProductForm.css'; 
+import './addEditProductForm.css';
+
 const AddEditProductForm = () => {
   const { id } = useParams(); // Get the product ID from the route params
   const isEditing = !!id; // Determine if it's an edit operation
@@ -19,7 +20,7 @@ const AddEditProductForm = () => {
   useEffect(() => {
     // If it's an edit operation (ID is available in params), fetch the product data
     if (isEditing) {
-      axios.get(`http://localhost:3001/products/${id}`)
+      axios.get(`https://pos-crud.onrender.com/products/${id}`)
         .then((response) => {
           // Set the form fields with existing product data
           setProduct(response.data);
@@ -43,7 +44,7 @@ const AddEditProductForm = () => {
 
     if (isEditing) {
       // If it's an edit operation, send a PUT request to update the product
-      axios.put(`http://localhost:3001/products/${id}`, product)
+      axios.put(`https://pos-crud.onrender.com/products/${id}`, product)
         .then((response) => {
           // Handle success
           console.log('Product updated:', response.data);
@@ -54,7 +55,7 @@ const AddEditProductForm = () => {
         });
     } else {
       // If it's not an edit operation, send a POST request to create a new product
-      axios.post('http://localhost:3001/products', product)
+      axios.post('https://pos-crud.onrender.com/products', product)
         .then((response) => {
           // Handle success
           console.log('Product added:', response.data);

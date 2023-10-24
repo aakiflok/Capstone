@@ -16,7 +16,7 @@ const Inventory: React.FC = () => {
   const fetchStockData = async () => {
     try {
       // Make a GET request to the '/stock' route
-      const response = await axios.get('http://localhost:3001/stock');
+      const response = await axios.get('https://pos-crud.onrender.com/stock');
       setStockList(response.data);
     } catch (error) {
       console.error('Error fetching stock data:', error);

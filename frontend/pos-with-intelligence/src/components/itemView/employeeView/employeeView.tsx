@@ -12,7 +12,7 @@ const EmployeeView: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/users/${id}`);
+        const response = await axios.get(`https://pos-crud.onrender.com/users/${id}`);
 
         if (isMounted) {
           setSelectedEmployee(response.data);
@@ -88,7 +88,7 @@ const EmployeeView: React.FC = () => {
             </tbody>
           </table>
           <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between' }}>
-            <Link to={`/employees/edit/${id}`}>
+            <Link to={`/editEmployee/${id}`}>
               <button style={{ padding: '10px 20px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px' }}>
                 Edit Employee
               </button>
