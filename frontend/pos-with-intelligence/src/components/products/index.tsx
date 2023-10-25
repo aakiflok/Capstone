@@ -47,8 +47,8 @@ const Products = () => {
       <Navbar />
       <div className="product-list">
         {user && user.role === 'admin' && (
-          <Link to="/addProduct" className="product-tile-link">
-            <button className="add-product-button">Add Product</button>
+          <Link to="/addEmployee" className="product-tile-link">
+            <button className="add-employee-button">Add Employee</button>
           </Link>
         )}
         

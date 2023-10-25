@@ -20,7 +20,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const router = express_1.default.Router();
 exports.userRoute = router;
 // Create a new user
-router.post('/users', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/addUser', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = new UserModel_1.User(req.body);
         const savedUser = yield user.save();
@@ -46,7 +46,7 @@ router.get('/users/:id', getUser, (req, res) => __awaiter(void 0, void 0, void 0
         const userId = req.params.id;
         const user = yield UserModel_1.User.findById(new mongoose_1.default.Types.ObjectId(userId));
         if (!user) {
-            return res.status(404).json({ message: 'Product not found' });
+            return res.status(404).json({ message: 'User not found' });
         }
         res.status(200).json(user);
     }
@@ -54,21 +54,46 @@ router.get('/users/:id', getUser, (req, res) => __awaiter(void 0, void 0, void 0
         res.status(500).json({ message: err.message });
     }
 }));
-// Update a user
-router.patch('/users/:id', getUser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    if (req.body.first_name != null) {
-        res.locals.user.first_name = req.body.first_name;
-    }
-    if (req.body.last_name != null) {
-        res.locals.user.last_name = req.body.last_name;
-    }
-    if (req.body.address != null) {
-        res.locals.user.address = req.body.address;
-    }
-    // Update other fields similarly
+router.put('/updateUser/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const updatedUser = yield res.locals.user.save();
-        res.json(updatedUser);
+        const { first_name, last_name, birthdate, address, username, password, // Remember: Store hashed passwords, not plain text
+        email, role, joining_date } = req.body;
+        const user = yield UserModel_1.User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        // Update user properties
+        if (first_name)
+            user.first_name = first_name;
+        if (last_name)
+            user.last_name = last_name;
+        if (birthdate)
+            user.birthdate = new Date(birthdate);
+        if (address)
+            user.address = address;
+        if (username)
+            user.username = username;
+        if (password)
+            user.password = password; // TODO: Hash the password
+        if (email)
+            user.email = email;
+        if (role)
+            user.role = role;
+        if (joining_date)
+            user.joining_date = new Date(joining_date);
+        yield user.save();
+        // Respond with the updated user fields
+        const responseObject = {
+            first_name: user.first_name,
+            last_name: user.last_name,
+            birthdate: user.birthdate,
+            address: user.address,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            joining_date: user.joining_date
+        };
+        res.status(200).json(responseObject);
     }
     catch (err) {
         res.status(400).json({ message: err.message });

@@ -53,7 +53,7 @@ function App() {
         <Route path="/addProduct" element={<RequireAuth loginPath="/login"><AddEditProductForm /></RequireAuth>}/>
         <Route path="/editProduct/:id" element={<RequireAuth loginPath="/login"><AddEditProductForm /></RequireAuth>}/>
         <Route path="/editEmployee/:id" element={<RequireAuth loginPath="/login"><AddEditEmployeeForm /></RequireAuth>}/>
-        <Route path="/addEmployee/:id" element={<RequireAuth loginPath="/login"><AddEditEmployeeForm /></RequireAuth>}/>
+        <Route path="/addEmployee" element={<RequireAuth loginPath="/login"><AddEditEmployeeForm /></RequireAuth>}/>
         
       </Routes>
     </AppContainer>

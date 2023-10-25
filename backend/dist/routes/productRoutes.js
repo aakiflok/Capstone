@@ -101,23 +101,24 @@ router.get('/products/:id', (req, res) => __awaiter(void 0, void 0, void 0, func
 // Update a product
 router.patch('/products/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const { name, price, category, description, image_uri } = req.body;
         const product = yield ProductModel_1.Product.findById(req.params.id);
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
-        // Update the product fields
-        if (req.body.name !== undefined) {
-            product.name = req.body.name;
-        }
-        if (req.body.price !== undefined) {
-            product.price = req.body.price;
-        }
-        if (req.body.category !== undefined) {
-            product.category = req.body.category;
-        }
-        // Update other fields similarly
-        const updatedProduct = yield product.save();
-        res.status(200).json(updatedProduct);
+        // Update product properties
+        if (name)
+            product.name = name;
+        if (price)
+            product.price = price;
+        if (category)
+            product.category = category;
+        if (description)
+            product.description = description;
+        if (image_uri)
+            product.image_uri = image_uri;
+        yield product.save(); // save the changes to the database
+        res.status(200).json(product);
     }
     catch (err) {
         res.status(400).json({ message: err.message });

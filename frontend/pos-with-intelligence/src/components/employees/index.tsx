@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios'; // Import Axios
 import Navbar from '../navigation/nav';
 import './employee.css';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Employees: React.FC = () => {
   const [employeeList, setEmployeeList] = useState([]);
@@ -35,6 +35,9 @@ const Employees: React.FC = () => {
   return (
     <>
       <Navbar></Navbar>
+      <Link to="/addProduct" className="product-tile-link">
+            <button className="add-product-button">Add Product</button>
+      </Link>
       <div className="employees-container">
         <div className="content">
           <h2>Employees List</h2>
