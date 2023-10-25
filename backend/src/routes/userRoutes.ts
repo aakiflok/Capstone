@@ -42,7 +42,7 @@ router.get('/users/:id', getUser, async (req: Request, res: Response) => {
   }
 });
 
-router.patch('/updateUser/:id', async (req: Request, res: Response) => {
+router.put('/updateUser/:id', async (req: Request, res: Response) => {
   try {
     const {
       first_name,
