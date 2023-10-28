@@ -14,11 +14,10 @@ const upload = multer({ storage: storage });
 router.post('/products', async (req: Request, res: Response) => {
   try {
     // Get product data from the request body
-    const { id, name, price, category, description, image_uri } = req.body;
+    const { name, price, category, description, image_uri } = req.body;
 
     // Create a new product instance
     const newProduct = new Product({
-      id,
       name,
       price,
       category,
@@ -28,8 +27,14 @@ router.post('/products', async (req: Request, res: Response) => {
 
     // Save the new product to the database
     const savedProduct = await newProduct.save();
+    const newStock = new Stock({
+      product_id: savedProduct._id, // Using the ID of the product we just saved
+      quantity: 0,
+      location: 'not stock' // You can adjust this as per your requirements
+    });
 
-    res.status(201).json(savedProduct);
+    await newStock.save(); // Save the stock entry
+    res.status(201).json(savedProduct._id);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
@@ -86,7 +91,7 @@ router.get('/products', async (req: Request, res: Response) => {
 router.get('/products/:id', async (req: Request, res: Response) => {
   try {
     const productId = req.params.id;
-    const product = await Product.findOne({ id: productId });
+    const product = await Product.findById(productId);
 
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
@@ -126,18 +131,32 @@ router.patch('/products/:id', async (req: Request, res: Response) => {
 // Delete a product
 router.delete('/products/:id', async (req: Request, res: Response) => {
   try {
-    const product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
+      // Fetch the stock record corresponding to the product
+      const stock = await Stock.findOne({ product_id: req.params.id });
+      
+      if (!stock) {
+          return res.status(404).json({ message: 'Stock record not found for the given product' });
+      }
+      
+      // Check stock quantity
+      if (stock.quantity > 0) {
+          return res.status(400).json({ message: 'Cannot delete product with stock quantity greater than zero' });
+      }
 
-    // Delete associated stock records if needed
-    await Stock.deleteMany({ product_id: product.id });
+      // If stock quantity is zero, delete the product
+      const product = await Product.findById(req.params.id);
+      if (!product) {
+          return res.status(404).json({ message: 'Product not found' });
+      }
 
-    // await product.remove();
-    res.json({ message: 'Product deleted' });
+      await product.deleteOne();
+
+      // Delete the corresponding stock record
+      await stock.deleteOne();
+
+      res.json({ message: 'Product and corresponding stock record deleted' });
   } catch (err: any) {
-    res.status(500).json({ message: err.message });
+      res.status(500).json({ message: err.message });
   }
 });
 

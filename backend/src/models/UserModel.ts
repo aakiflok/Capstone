@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 const usersModel = new mongoose.Schema({
-    id: { type: Number, required: true, unique: true },
     first_name: String,
     last_name: String,
     birthdate: Date,

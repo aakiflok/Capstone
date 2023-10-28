@@ -12,7 +12,7 @@ const EmployeeView: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`https://pos-crud.onrender.com/users/${id}`);
+        const response = await axios.get(`http://localhost:3001/users/${id}`);
 
         if (isMounted) {
           setSelectedEmployee(response.data);

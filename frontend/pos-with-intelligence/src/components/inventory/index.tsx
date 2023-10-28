@@ -16,7 +16,7 @@ const Inventory: React.FC = () => {
   const fetchStockData = async () => {
     try {
       // Make a GET request to the '/stock' route
-      const response = await axios.get('https://pos-crud.onrender.com/stock');
+      const response = await axios.get('http://localhost:3001/stock');
       setStockList(response.data);
     } catch (error) {
       console.error('Error fetching stock data:', error);
@@ -25,7 +25,7 @@ const Inventory: React.FC = () => {
 
   const handleViewClick = (stock: any) => {
     setSelectedProduct(stock);
-    navigate(`/inventory/${stock.product_id}`);
+    navigate(`/inventory/${stock._id}`);
   };
 
   const closeModal = () => {
@@ -41,7 +41,7 @@ const Inventory: React.FC = () => {
           <table className="stock-table">
             <thead>
               <tr>
-                <th>Product ID</th>
+                <th>Product Name</th>
                 <th>Quantity</th>
                 <th>Location</th>
                 <th>Actions</th>
@@ -49,8 +49,8 @@ const Inventory: React.FC = () => {
             </thead>
             <tbody>
               {stockList.map((stock: any) => (
-                <tr key={stock.product_id}>
-                  <td>{stock.product_id}</td>
+                <tr key={stock._id}>
+                  <td>{stock.product_name}</td>
                   <td>{stock.quantity}</td>
                   <td>{stock.location}</td>
                   <td>

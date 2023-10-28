@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../../navigation/nav';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { Link, useParams } from 'react-router-dom';
 import './addEditProductForm.css';
 
 const AddEditProductForm = () => {
   const { id } = useParams(); // Get the product ID from the route params
   const isEditing = !!id; // Determine if it's an edit operation
-
+  const navigate = useNavigate();
+  
   const [product, setProduct] = useState({
-    id: '',
     name: '',
     price: '',
     category: '',
@@ -20,7 +21,7 @@ const AddEditProductForm = () => {
   useEffect(() => {
     // If it's an edit operation (ID is available in params), fetch the product data
     if (isEditing) {
-      axios.get(`https://pos-crud.onrender.com/products/${id}`)
+      axios.get(`http://localhost:3001/products/${id}`)
         .then((response) => {
           // Set the form fields with existing product data
           setProduct(response.data);
@@ -44,9 +45,11 @@ const AddEditProductForm = () => {
 
     if (isEditing) {
       // If it's an edit operation, send a PUT request to update the product
-      axios.put(`https://pos-crud.onrender.com/products/${id}`, product)
+      axios.put(`http://localhost:3001/products/${id}`, product)
         .then((response) => {
           // Handle success
+          alert('The product has been updated successfully');
+          navigate('/product/' + id);
           console.log('Product updated:', response.data);
         })
         .catch((error) => {
@@ -55,7 +58,7 @@ const AddEditProductForm = () => {
         });
     } else {
       // If it's not an edit operation, send a POST request to create a new product
-      axios.post('https://pos-crud.onrender.com/products', product)
+      axios.post('http://localhost:3001/products', product)
         .then((response) => {
           // Handle success
           console.log('Product added:', response.data);
@@ -73,17 +76,6 @@ const AddEditProductForm = () => {
       <div className="product-form-container">
         <h2>{isEditing ? 'Edit Product' : 'Add a Product'}</h2>
         <form className="product-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-            <label htmlFor="id">ID</label>
-            <input
-              type="text"
-              id="id"
-              name="id"
-              value={product.id}
-              onChange={handleChange}
-              required
-            />
-          </div>
           <div className="form-group">
             <label htmlFor="name">Name</label>
             <input

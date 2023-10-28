@@ -5,6 +5,7 @@ import Navbar from '../../navigation/nav';
 import axios from 'axios';
 import img1 from '../../../LG_TV_1.jpg';
 import Cookies from 'js-cookie';
+import { useNavigate } from "react-router-dom";
 
 const ProductView: React.FC = () => {
   const { id } = useParams();
@@ -13,15 +14,16 @@ const ProductView: React.FC = () => {
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [user, setUser] = useState<any | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`https://pos-crud.onrender.com/products/${id}`);
+        const response = await axios.get(`http://localhost:3001/products/${id}`);
         setProduct(response.data);
         
         // Fetch the quantity of the product
-        const quantityResponse = await axios.get(`https://pos-crud.onrender.com/stock/quantity/${id}`);
+        const quantityResponse = await axios.get(`http://localhost:3001/stock/quantity/${id}`);
         setQuantity(quantityResponse.data.quantity);
       } catch (err) {
         console.log("Error: ", err);
@@ -30,7 +32,7 @@ const ProductView: React.FC = () => {
 
     const fetchMessages = async () => {
       try {
-        const response = await axios.get(`https://pos-crud.onrender.com/products/${id}/messages`);
+        const response = await axios.get(`http://localhost:3001/products/${id}/messages`);
         setMessages(response.data);
       } catch (error) {
         console.error(error);
@@ -63,48 +65,74 @@ const ProductView: React.FC = () => {
   };
 
   const handleSubmitMessage = async () => {
-    // ...
+    try {
+      const response = await axios.post(`http://localhost:3001/products/${id}/messages/${user._id}`, {
+        message: newMessage,
+      });
+  
+      // Add the new message to the state
+      setMessages([...messages, response.data]);
+  
+      // Clear the message input field
+      setNewMessage('');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeleteProduct = async () => {
+    try {
+      await axios.delete(`http://localhost:3001/products/${id}`);
+      navigate('/products');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <>
       <Navbar />
       <div className="product-view-container">
-        <div className="product-content">
-          <div className="product-image">
-            <img src={img1} alt={product.name} />
-          </div>
+        <div className="product-header">
+          <img src={img1} alt={product.name} className="product-main-image" />
           <div className="product-details">
             <h2>{product.name}</h2>
-            <p className="product-price">Price: ${product.price}</p>
+            <p className="product-price">${product.price}</p>
             <p className="product-description">{product.description}</p>
             <p className="product-quantity">Quantity: {quantity}</p>
+            {user && user.role === 'admin' && (
+              <><Link to={`/editProduct/${product._id}`} key={product._id}>
+                <button className="edit-product-button">Edit Product</button>
+              </Link>
+              <button className="delete-product-button" onClick={handleDeleteProduct}>
+                  Delete Product
+              </button></>
+            )}
           </div>
         </div>
-        {user && user.role === 'admin' && (
-          <Link to={`/editProduct/${product.id}`} key={product.id}>
-            <button className="edit-product-button">Edit Product</button>
-          </Link>
-        )}
-        {/* List of messages */}
-        <div className="message-list">
-          {messages.map((message) => (
-            <div key={message._id} className="message">
-              <p>{message.message}</p>
-            </div>
-          ))}
-        </div>
+        
+        {/* Discussion form section */}
+        <div className="discussion-section">
+          <h3>Discussion Form</h3>
+          <div className="message-list">
+            {messages.map((message) => (
+              <div key={message._id} className="message">
+                <strong>{message.user} ({message.role}):</strong>
+                <p>{message.message}</p>
+              </div>
+            ))}
+          </div>
   
-        {/* Form to submit a new message */}
-        <div className="message-form">
-          <textarea
-            placeholder="Add your message..."
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-          />
-          <button className="submit-message-button" onClick={handleSubmitMessage}>
-            Submit
-          </button>
+          <div className="message-form">
+            <textarea
+              placeholder="Add your message..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+            />
+            <button className="submit-message-button" onClick={handleSubmitMessage}>
+              Send
+            </button>
+          </div>
         </div>
       </div>
     </>

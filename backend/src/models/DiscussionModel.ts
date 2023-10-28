@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
+
 const discussionsSchema = new mongoose.Schema({
   product_id: {
-    type: Number,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'Product',
     required: true,
   },
   user_id: {
-    type: Number,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   },
@@ -20,5 +21,6 @@ const discussionsSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
 const Discussions = mongoose.model('Discussions', discussionsSchema);
-export{Discussions}
+export { Discussions };

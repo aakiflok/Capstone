@@ -9,14 +9,14 @@ import { Product } from '../../models/product.module';
 import Cookies from 'js-cookie';
 
 const Products = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [user, setUser] = useState<any | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("https://pos-crud.onrender.com/products");
+        const response = await axios.get("http://localhost:3001/products");
         setProducts(response.data);
       } catch (err) {
         console.log("Error: ", err);
@@ -47,19 +47,19 @@ const Products = () => {
       <Navbar />
       <div className="product-list">
         {user && user.role === 'admin' && (
-          <Link to="/addEmployee" className="product-tile-link">
-            <button className="add-employee-button">Add Employee</button>
+          <Link to="/addProduct" className="product-tile-link">
+            <button className="add-product-button">Add Product</button>
           </Link>
         )}
         
         <div className="product-tiles-container">
         {products.map((product) => (
           <Link
-            to={`/product/${product.id}`} // Pass the productId as a URL parameter
-            key={product.id}
+            to={`/product/${product._id}`} // Pass the productId as a URL parameter
+            key={product._id}
           >
             <ProductTile
-              key={product.id}
+              key={product._id}
               product={product}
               onClick={openProductView}
             />

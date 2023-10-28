@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 const stockSchema = new mongoose.Schema({
-    stock_id: { type: Number, required: true, unique: true, autoIncrement: true },
-    product_id: { type: Number, required: true },
+    product_id: { type:  mongoose.Schema.Types.ObjectId, required: true },
     quantity: { type: Number, required: true },
     location: { type: String, required: true },
   });

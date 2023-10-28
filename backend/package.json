@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "jumpStart": "nodemon src/index.ts",
     "start": "node ./dist/index.js",
     "build": "npm i"
   },

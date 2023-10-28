@@ -7,8 +7,31 @@ const router = express.Router();
 
 // Create a new user
 router.post('/addUser', async (req: Request, res: Response) => {
+  console.log("here 1");
   try {
-    const user = new User(req.body);
+    const {
+      first_name,
+      last_name,
+      birthdate,
+      address,
+      username,
+      password, 
+      email,
+      role,
+      joining_date
+    } = req.body;
+
+    const user = new User({first_name,
+      last_name,
+      birthdate,
+      address,
+      username,
+      password, 
+      email,
+      role,
+      joining_date});
+    // Set the users properties that came in the request body
+    
     const savedUser = await user.save();
     res.status(201).json(savedUser);
   } catch (err: any) {

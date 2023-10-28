@@ -1,35 +1,60 @@
 import express, { Request, Response } from 'express';
 import { Stock } from './../models/StockModel';
+import { Product } from '../models/ProductModel';
 
 const router = express.Router();
 
 // Get all stock records
 router.get('/stock', async (req: Request, res: Response) => {
   try {
-    const stock = await Stock.find();
-    res.status(200).json(stock);
+    const stockRecords = await Stock.find();
+
+    // Fetching product names for each stock record asynchronously
+    const enrichedStock = await Promise.all(stockRecords.map(async (stockItem) => {
+      const product = await Product.findById(stockItem.product_id);
+      return {
+        _id: stockItem._id,
+        product_name: product ? product.name : 'Product Not Found',
+        quantity: stockItem.quantity,
+        location: stockItem.location
+      };
+    }));
+
+    res.status(200).json(enrichedStock);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Get a specific stock record by stock_id
-router.get('/stock/:stock_id', async (req: Request, res: Response) => {
+// Get a specific stock record by _id
+router.get('/stock/:id', async (req: Request, res: Response) => {
   try {
-    const stock = await Stock.findOne({ stock_id: req.params.stock_id });
+    const stockId = req.params.id;
+    const stock = await Stock.findById(stockId);
     if (!stock) {
       return res.status(404).json({ message: 'Stock record not found' });
     }
-    res.status(200).json(stock);
+
+    const product = await Product.findById(stock.product_id);
+    
+    const enrichedStock=  {
+      _id: stock._id,
+      product_name: product ? product.name : 'Product Not Found',
+      product_id : product? product._id: 'Product Not Found',
+      quantity: stock.quantity,
+      location: stock.location
+    };
+    res.status(200).json(enrichedStock);
+    
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
 });
 
 // Update a stock record
-router.patch('/stock/:stock_id', async (req: Request, res: Response) => {
+router.patch('/stock/:id', async (req: Request, res: Response) => {
   try {
-    const stock = await Stock.findOne({ stock_id: req.params.stock_id });
+    const stock = await Stock.findById(req.params.id);
     if (!stock) {
       return res.status(404).json({ message: 'Stock record not found' });
     }
@@ -51,12 +76,11 @@ router.patch('/stock/:stock_id', async (req: Request, res: Response) => {
 });
 
 //get quantity
-router.get('/stock/quantity/:product_id', async (req: Request, res: Response) => {
+// Get quantity
+router.get('/stock/quantity/:productId', async (req: Request, res: Response) => {
   try {
-    const product_id = req.params.product_id;
-    
-    // Find the stock record with the given product_id
-    const stock = await Stock.findOne({ product_id });
+    const productId = req.params.productId;
+    const stock = await Stock.findOne({ product_id: productId });
 
     if (!stock) {
       return res.status(404).json({ message: 'Stock record not found' });
@@ -69,11 +93,10 @@ router.get('/stock/quantity/:product_id', async (req: Request, res: Response) =>
   }
 });
 
-
 // Delete a stock record
-router.delete('/stock/:stock_id', async (req: Request, res: Response) => {
+router.delete('/stock/:id', async (req: Request, res: Response) => {
   try {
-    const stock = await Stock.findOne({ stock_id: req.params.stock_id });
+    const stock = await Stock.findById(req.params.id);
     if (!stock) {
       return res.status(404).json({ message: 'Stock record not found' });
     }

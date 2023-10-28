@@ -14,7 +14,7 @@ const Customers: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('https://pos-crud.onrender.com/customers');
+      const response = await axios.get('http://localhost:3001/customers');
       setCustomerList(response.data);
     } catch (error) {
       console.error('Error fetching customer data:', error);

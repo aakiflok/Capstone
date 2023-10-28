@@ -16,7 +16,7 @@ const Employees: React.FC = () => {
   const fetchEmployeeData = async () => {
     try {
       // Make a GET request to the '/users' route
-      const response = await axios.get('https://pos-crud.onrender.com/users');
+      const response = await axios.get('http://localhost:3001/users');
       setEmployeeList(response.data);
     } catch (error) {
       console.error('Error fetching employee data:', error);
@@ -35,9 +35,10 @@ const Employees: React.FC = () => {
   return (
     <>
       <Navbar></Navbar>
-      <Link to="/addProduct" className="product-tile-link">
-            <button className="add-product-button">Add Product</button>
-      </Link>
+      <Link to="/addEmployee" className="product-tile-link">
+            <button className="add-employee-button">Add Employee</button>
+          </Link>
+      
       <div className="employees-container">
         <div className="content">
           <h2>Employees List</h2>
