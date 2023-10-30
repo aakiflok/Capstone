@@ -93,11 +93,11 @@ const InventoryView: React.FC = () => {
         </div>
       </div>
       <div className="button-container">
-        <Link to={`/employees/edit/${id}`}>
-          <button className="edit-button">
-            Edit Inventory
-          </button>
-        </Link>
+      {user && user.role === 'admin' && 
+              <Link to={`/editInventory/${selectedProduct._id}`} key={selectedProduct._id}>
+                <button className="edit-product-button">Edit Invetory</button>
+              </Link>
+            }
         {user && user.role === 'admin' && (
           <button onClick={handleDeleteEmployee} className="delete-button">
             Delete Record

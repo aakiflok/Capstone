@@ -19,6 +19,7 @@ import Employees from "./components/employees";
 import EmployeeView from "./components/itemView/employeeView/employeeView";
 import CustomerView from "./components/itemView/customerView/customerView";
 import AddEditEmployeeForm from "./components/forms/employeeForms/addEditEmployeeForm";
+import AddEditInventoryForm from "./components/forms/inverntoryForms/addEditInventoryForm";
 
 
 const AppContainer = styled.div`
@@ -50,6 +51,7 @@ function App() {
         <Route path="/customers/:id" element={<RequireAuth loginPath="/login"><CustomerView /></RequireAuth>}/>
         <Route path="/employees/:id" element={<RequireAuth loginPath="/login"><EmployeeView /></RequireAuth>}/>
         <Route path="/inventory/:id" element={<RequireAuth loginPath="/login"><InventoryView /></RequireAuth>}/>
+        <Route path="/editInventory/:id" element={<RequireAuth loginPath="/login"><AddEditInventoryForm /></RequireAuth>}/>
         <Route path="/addProduct" element={<RequireAuth loginPath="/login"><AddEditProductForm /></RequireAuth>}/>
         <Route path="/editProduct/:id" element={<RequireAuth loginPath="/login"><AddEditProductForm /></RequireAuth>}/>
         <Route path="/editEmployee/:id" element={<RequireAuth loginPath="/login"><AddEditEmployeeForm /></RequireAuth>}/>

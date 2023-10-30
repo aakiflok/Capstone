@@ -17,8 +17,8 @@ router.get('/stock', async (req: Request, res: Response) => {
         product_name: product ? product.name : 'Product Not Found',
         quantity: stockItem.quantity,
         location: stockItem.location,
-        price: product?.price,
-        discountinued: product?.discontinued,        
+        price: product ? product.price: 0,
+        discountinued: product ? product.discontinued : 'N/A',        
       };
     }));
 
@@ -44,7 +44,9 @@ router.get('/stock/:id', async (req: Request, res: Response) => {
       product_name: product ? product.name : 'Product Not Found',
       product_id : product? product._id: 'Product Not Found',
       quantity: stock.quantity,
-      location: stock.location
+      location: stock.location,
+      price: product ? product.price: 0,
+      discountinued: product ? product.discontinued : 'N/A',        
     };
     res.status(200).json(enrichedStock);
     

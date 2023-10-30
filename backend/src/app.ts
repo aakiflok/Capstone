@@ -6,6 +6,7 @@ import {userRoute} from './routes/userRoutes'
 import { stockRoute } from './routes/stockRoute';
 import { productRoute } from './routes/productRoutes';
 import { productDicussionRoute } from './routes/productDiscussionRoutes';
+import { unitSerialRoute } from './routes/serialRoutes';
 const app = express();
 app.set('trust proxy', true);
 app.use(json());
@@ -14,7 +15,8 @@ app.use(customerRoute);
 app.use(userRoute);
 app.use(stockRoute);
 app.use(productRoute);
-app.use(productDicussionRoute)
+app.use(productDicussionRoute);
+app.use(unitSerialRoute);
 app.all('*', async (req, res) => {
     res.send('all');
   });

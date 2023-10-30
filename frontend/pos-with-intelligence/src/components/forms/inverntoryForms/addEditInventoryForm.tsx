@@ -1,71 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '../../navigation/nav';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
 import { useParams } from 'react-router-dom';
-import './addEditProductForm.css';
+import './addEditInventoryForm.css'
+import Navbar from '../../navigation/nav';
 
-const AddEditInventoryForm = () => {
-  const { id } = useParams(); // Get the product ID from the route params
-  const isEditing = !!id; // Determine if it's an edit operation
-  const navigate = useNavigate();
-  
-  const [product, setProduct] = useState({
-    name: '',
-    price: '',
-    category: '',
-    description: '',
-    image_uri: '',
+interface Stock {
+  quantity: number;
+  location: string;
+}
+
+interface UnitSerial {
+  Unit_Serial_id: number;
+  stock_id: number;
+  serial_number: string;
+  isAvailable: boolean;
+}
+
+const AddEditInventoryForm: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const isEditing = !!id;
+
+  const [stock, setStock] = useState<Stock>({
+    quantity: 0,
+    location: '',
   });
 
+  const [unitSerials, setUnitSerials] = useState<UnitSerial[]>([]);
+
   useEffect(() => {
-    // If it's an edit operation (ID is available in params), fetch the product data
     if (isEditing) {
-      axios.get(`http://localhost:3001/products/${id}`)
+      // Get the stock and its associated serial numbers
+      axios.get(`http://localhost:3001/stocks/${id}`)
         .then((response) => {
-          // Set the form fields with existing product data
-          setProduct(response.data);
+          setStock(response.data);
+          axios.get(`http://localhost:3001/unit-serials-by-stock/${id}`)
+            .then((res) => {
+              setUnitSerials(res.data);
+            })
+            .catch((e) => {
+              console.error('Error fetching Unit Serials:', e);
+            })
         })
         .catch((error) => {
-          console.error('Error fetching product:', error);
+          console.error('Error fetching stock:', error);
         });
     }
   }, [id, isEditing]);
 
-  const handleChange = (e: any) => {
+  const handleStockChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setProduct({
-      ...product,
-      [name]: value,
-    });
+    setStock(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
+  const handleSerialChange = (index: number, field: keyof UnitSerial, value: string | number | boolean) => {
+    const updatedSerials = [...unitSerials];
+    updatedSerials[index][field] = value as never;
+    setUnitSerials(updatedSerials);
+  };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (isEditing) {
-      // If it's an edit operation, send a PUT request to update the product
-      axios.put(`http://localhost:3001/products/${id}`, product)
-        .then((response) => {
-          // Handle success
-          alert('The product has been updated successfully');
-          navigate('/product/' + id);
-          console.log('Product updated:', response.data);
+      axios.put(`http://localhost:3001/updateStock/${id}`, stock)
+        .then(response => {
+          console.log('Stock updated:', response.data);
         })
-        .catch((error) => {
-          // Handle error
-          console.error('Error updating product:', error);
+        .catch(error => {
+          console.error('Error updating stock:', error);
         });
     } else {
-      // If it's not an edit operation, send a POST request to create a new product
-      axios.post('http://localhost:3001/products', product)
-        .then((response) => {
-          // Handle success
-          console.log('Product added:', response.data);
+      axios.post('http://localhost:3001/addStock', stock)
+        .then(response => {
+          console.log('Stock added:', response.data);
         })
-        .catch((error) => {
-          // Handle error
-          console.error('Error adding product:', error);
+        .catch(error => {
+          console.error('Error adding stock:', error);
         });
     }
   };
@@ -73,71 +82,53 @@ const AddEditInventoryForm = () => {
   return (
     <>
       <Navbar />
-      <div className="product-form-container">
-        <h2>{isEditing ? 'Edit Product' : 'Add a Product'}</h2>
-        <form className="product-form" onSubmit={handleSubmit}>
+      <div className="inventory-form-container">
+        <h2>{isEditing ? 'Edit Inventory' : 'Add Inventory'}</h2>
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="name">Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={product.name}
-              onChange={handleChange}
-              required
-            />
+            <label>Count</label>
+            <span>{parseInt(id ?? '', 10) || 'New'}</span>
           </div>
           <div className="form-group">
-            <label htmlFor="price">Price</label>
+            <label htmlFor="quantity">Quantity</label>
             <input
               type="number"
-              id="price"
-              name="price"
-              value={product.price}
-              onChange={handleChange}
-              step="0.01"
+              id="quantity"
+              name="quantity"
+              value={stock.quantity}
+              onChange={handleStockChange}
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="category">Category</label>
+            <label htmlFor="location">Location</label>
             <input
               type="text"
-              id="category"
-              name="category"
-              value={product.category}
-              onChange={handleChange}
+              id="location"
+              name="location"
+              value={stock.location}
+              onChange={handleStockChange}
               required
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="description">Description</label>
-            <textarea
-              id="description"
-              name="description"
-              value={product.description}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="image_uri">Image URI</label>
-            <input
-              type="url"
-              id="image_uri"
-              name="image_uri"
-              value={product.image_uri}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <button type="submit" className="submit-button">
-            {isEditing ? 'Update Product' : 'Add Product'}
-          </button>
+          {unitSerials.map((serial, index) => (
+            <div key={serial.Unit_Serial_id} className="form-group">
+              <label htmlFor={`serial_number_${index}`}>Serial Number {index + 1}</label>
+              <input
+                type="text"
+                id={`serial_number_${index}`}
+                value={serial.serial_number}
+                onChange={e => handleSerialChange(index, 'serial_number', e.target.value)}
+                required
+                disabled={!serial.isAvailable} // disable input if isAvailable is false
+              />
+            </div>
+          ))}
+          <button type="submit">{isEditing ? 'Update Inventory' : 'Add Inventory'}</button>
         </form>
       </div>
     </>
   );
-};
+}
 
 export default AddEditInventoryForm;
