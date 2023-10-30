@@ -76,6 +76,18 @@ const InventoryView: React.FC = () => {
                 <td>Location of Storage</td>
                 <td>{selectedProduct.location}</td>
               </tr>
+              <tr>
+                <td>Cost per unit</td>
+                <td>{selectedProduct.price}</td>
+              </tr>
+              <tr>
+                <td>Stocl Value</td>
+                <td>{selectedProduct.price * selectedProduct.quantity}</td>
+              </tr>
+              <tr>
+                <td>Discontinue?</td>
+                <td>{selectedProduct.discontinued ? "Yes" : "No"}</td>
+              </tr>
             </tbody>
           </table>
         </div>

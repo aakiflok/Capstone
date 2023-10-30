@@ -14,7 +14,7 @@ const upload = multer({ storage: storage });
 router.post('/products', async (req: Request, res: Response) => {
   try {
     // Get product data from the request body
-    const { name, price, category, description, image_uri } = req.body;
+    const { name, price, category, description, image_uri,discontinued } = req.body;
 
     // Create a new product instance
     const newProduct = new Product({
@@ -23,6 +23,7 @@ router.post('/products', async (req: Request, res: Response) => {
       category,
       description,
       image_uri,
+      discontinued
     });
 
     // Save the new product to the database
@@ -32,6 +33,7 @@ router.post('/products', async (req: Request, res: Response) => {
       quantity: 0,
       location: 'not stock' // You can adjust this as per your requirements
     });
+    console.log(newStock);
 
     await newStock.save(); // Save the stock entry
     res.status(201).json(savedProduct._id);

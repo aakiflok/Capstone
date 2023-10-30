@@ -100,14 +100,12 @@ const ProductView: React.FC = () => {
             <p className="product-price">${product.price}</p>
             <p className="product-description">{product.description}</p>
             <p className="product-quantity">Quantity: {quantity}</p>
-            {user && user.role === 'admin' && (
-              <><Link to={`/editProduct/${product._id}`} key={product._id}>
+            {user && user.role === 'admin' && 
+              <Link to={`/editProduct/${product._id}`} key={product._id}>
                 <button className="edit-product-button">Edit Product</button>
               </Link>
-              <button className="delete-product-button" onClick={handleDeleteProduct}>
-                  Delete Product
-              </button></>
-            )}
+            }
+            <p>{product.discontinued}</p>
           </div>
         </div>
         

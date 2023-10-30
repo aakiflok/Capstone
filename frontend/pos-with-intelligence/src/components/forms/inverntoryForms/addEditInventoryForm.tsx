@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../navigation/nav';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import './addEditProductForm.css';
 
-const AddEditProductForm = () => {
+const AddEditInventoryForm = () => {
   const { id } = useParams(); // Get the product ID from the route params
   const isEditing = !!id; // Determine if it's an edit operation
   const navigate = useNavigate();
@@ -16,7 +16,6 @@ const AddEditProductForm = () => {
     category: '',
     description: '',
     image_uri: '',
-    discontinued: false,
   });
 
   useEffect(() => {
@@ -38,21 +37,6 @@ const AddEditProductForm = () => {
     setProduct({
       ...product,
       [name]: value,
-    });
-  };
-  const handleRadioChange = (e: any) => {
-    const { name, value } = e.target;
-    
-    let finalValue = value;
-    
-    // If the changed element is the discontinued radio, parse the value to boolean
-    if (name === 'discontinued') {
-      finalValue = value === 'true';
-    }
-  
-    setProduct({
-      ...product,
-      [name]: finalValue,
     });
   };
 
@@ -147,28 +131,6 @@ const AddEditProductForm = () => {
               required
             />
           </div>
-          <div className="form-group">
-            <label>Discontinued</label>
-              <input
-                type="radio"
-                id="discontinued-yes"
-                name="discontinued"
-                value="true"
-                checked={product.discontinued === true}
-                onChange={handleRadioChange}
-              />
-              <label htmlFor="discontinued-yes">Yes</label>
-
-              <input
-                type="radio"
-                id="discontinued-no"
-                name="discontinued"
-                value="false"
-                checked={product.discontinued === false}
-                onChange={handleRadioChange}
-              />
-              <label htmlFor="discontinued-no">No</label>
-          </div>
           <button type="submit" className="submit-button">
             {isEditing ? 'Update Product' : 'Add Product'}
           </button>
@@ -178,4 +140,4 @@ const AddEditProductForm = () => {
   );
 };
 
-export default AddEditProductForm;
+export default AddEditInventoryForm;

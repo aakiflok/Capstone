@@ -16,7 +16,9 @@ router.get('/stock', async (req: Request, res: Response) => {
         _id: stockItem._id,
         product_name: product ? product.name : 'Product Not Found',
         quantity: stockItem.quantity,
-        location: stockItem.location
+        location: stockItem.location,
+        price: product?.price,
+        discountinued: product?.discontinued,        
       };
     }));
 

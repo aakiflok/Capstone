@@ -5,6 +5,7 @@ const productSchema = new mongoose.Schema({
     category: { type: String, required: true },
     description: String,
     image_uri: { type: String, required: true },
+    discontinued: {type: Boolean, requied: true}
   });
 const Product = mongoose.model('Product', productSchema);
 export {Product}
