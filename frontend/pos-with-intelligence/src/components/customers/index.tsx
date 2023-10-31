@@ -23,7 +23,7 @@ const Customers: React.FC = () => {
 
   const handleViewClick = (customer: any) => {
     setSelectedCustomer(customer);
-    navigate(`/customers/${customer.customer_id}`);
+    navigate(`/customers/${customer._id}`);
   };
 
   const closeModal = () => {

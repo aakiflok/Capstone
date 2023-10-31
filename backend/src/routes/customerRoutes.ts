@@ -62,7 +62,7 @@ router.delete('/customers/:id', getCustomer, async (req: Request, res: Response)
 
 async function getCustomer(req: Request, res: Response, next: Function) {
     try {
-      const customer = await Customers.$where(req.params.id);
+      const customer = await Customers.findById(req.params.id);
       if (customer == null) {
         return res.status(404).json({ message: 'Customer not found' });
       }

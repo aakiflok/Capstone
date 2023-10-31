@@ -69,7 +69,7 @@ const CustomerView: React.FC = () => {
                 <td>Email</td>
                 <td>{selectedCustomer.email}</td>
               </tr>
-              {/* Add other fields as required */}
+             
             </tbody>
           </table>
           <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between' }}>

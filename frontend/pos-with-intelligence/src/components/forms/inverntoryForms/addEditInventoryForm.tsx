@@ -5,13 +5,13 @@ import './addEditInventoryForm.css';
 import Navbar from '../../navigation/nav';
 
 interface Stock {
+  _id: string,
   quantity: number;
   location: string;
 }
 
 interface UnitSerial {
-  Unit_Serial_id: number;
-  stock_id: number;
+  stock_id: string;
   serial_number: string;
   isAvailable: boolean;
 }
@@ -21,19 +21,21 @@ const AddEditInventoryForm: React.FC = () => {
   const isEditing = !!id;
 
   const [stock, setStock] = useState<Stock>({
+    _id: id || '0',
     quantity: 0,
     location: '',
   });
 
   const [unitSerials, setUnitSerials] = useState<UnitSerial[]>([]);
-  const [dynamicRows, setDynamicRows] = useState<number[]>([]);
-  const [newSerialNumber, setNewSerialNumber] = useState<string>('');
+  const [originalQuantity, setOriginalQuantity] = useState<number>(0);
+
 
   useEffect(() => {
     if (isEditing) {
       axios.get(`http://localhost:3001/stock/${id}`)
         .then((response) => {
           setStock(response.data);
+          setOriginalQuantity(response.data.quantity);
           axios.get(`http://localhost:3001/unit-serials-by-stock/${id}`)
             .then((res) => {
               setUnitSerials(res.data);
@@ -50,8 +52,7 @@ const AddEditInventoryForm: React.FC = () => {
       while (unitSerials.length < totalRows) {
         unitSerials.push({
           serial_number: '',
-          Unit_Serial_id: 0,
-          stock_id: 0,
+          stock_id: '0',
           isAvailable: false,
         });
       }
@@ -63,20 +64,13 @@ const AddEditInventoryForm: React.FC = () => {
     setStock(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSerialChange = (index: number, field: keyof UnitSerial, value: string | number | boolean) => {
-    const updatedSerials = [...unitSerials];
-    updatedSerials[index][field] = value as never;
-    setUnitSerials(updatedSerials);
-  };
-
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
     const updatedSerials = [...unitSerials];
     while (updatedSerials.length < value) {
       updatedSerials.push({
         serial_number: '',
-        Unit_Serial_id: 0,
-        stock_id: 0,
+        stock_id: '0',
         isAvailable: false,
       });
     }
@@ -93,13 +87,15 @@ const AddEditInventoryForm: React.FC = () => {
     setUnitSerials(updatedSerials);
   };
 
-  const handleAddSerial = async (index: number) => {
-    const newSerial = {
-      stock_id: id,
-      serial_number: unitSerials[index].serial_number,
-      isAvailable: true,
-    };
-    if (!isEditing || !unitSerials[index].Unit_Serial_id) {
+  const handleAddSerial = async () => {
+    const numberOfNewSerials = stock.quantity - originalQuantity;
+
+    for (let i = 0; i < numberOfNewSerials; i++) {
+      const newSerial: Partial<UnitSerial> = {
+        stock_id: stock?._id,
+        serial_number: unitSerials[unitSerials.length - numberOfNewSerials + i]?.serial_number,
+        isAvailable: true,
+      };
       try {
         const response = await axios.post('http://localhost:3001/addUnitSerial', newSerial);
         console.log('Added new serial:', response.data);
@@ -112,7 +108,7 @@ const AddEditInventoryForm: React.FC = () => {
   const handleRemoveSerial = async (rowNumber: number) => {
     try {
       const serialToDelete = unitSerials[rowNumber];
-      const response = await axios.delete(`http://localhost:3001/unit-serial/${serialToDelete.Unit_Serial_id}`);
+      const response = await axios.delete(`http://localhost:3001/unit-serial/${serialToDelete}`);
       console.log('Deleted serial:', response.data);
       setUnitSerials(prev => prev.filter((_, idx) => idx !== rowNumber));
     } catch (error) {
@@ -142,57 +138,53 @@ const AddEditInventoryForm: React.FC = () => {
   };
   return (
     <>
-        <Navbar />
-        <div className="inventory-form-container">
-            <h2>{isEditing ? 'Edit Inventory' : 'Add Inventory'}</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="quantity">Quantity:</label>
-                    <input 
-                        type="number"
-                        id="quantity"
-                        name="quantity"
-                        value={stock.quantity}
-                        onChange={handleQuantityChange}
-                    />
-                </div>
+      <Navbar />
+      <div className="inventory-form-container">
+        <h2>{isEditing ? 'Edit Inventory' : 'Add Inventory'}</h2>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="quantity">Quantity:</label>
+            <input
+              type="number"
+              id="quantity"
+              name="quantity"
+              value={stock.quantity}
+              onChange={handleQuantityChange}
+            />
+          </div>
 
-                <div>
-                    <label htmlFor="location">Location:</label>
-                    <input 
-                        type="text"
-                        id="location"
-                        name="location"
-                        value={stock.location}
-                        onChange={handleStockChange}
-                    />
-                </div>
+          <div>
+            <label htmlFor="location">Location:</label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={stock.location}
+              onChange={handleStockChange}
+            />
+          </div>
 
-                <h3>Serial Numbers:</h3>
-                {unitSerials.map((serial, index) => (
-                    <div key={index}>
-                        <input
-                            type="text"
-                            value={serial.serial_number}
-                            onChange={(e) => handleSerialInputChange(index, e.target.value)}
-                        />
-                        <button type="button" onClick={() => handleRemoveSerial(index)}>Remove</button>
-                    </div>
-                ))}
-                <button type="button" onClick={() => setUnitSerials([...unitSerials, {
-                    serial_number: '',
-                    Unit_Serial_id: 0,
-                    stock_id: 0,
-                    isAvailable: false,
-                }])}>Add Serial Number</button>
-
-                <div>
-                    <button type="submit">{isEditing ? 'Update' : 'Add'} Inventory</button>
-                </div>
-            </form>
-        </div>
+          <h3>Serial Numbers:</h3>
+          {unitSerials.map((serial, index) => (
+            <div key={index}>
+              <input
+                type="text"
+                value={serial.serial_number}
+                onChange={(e) => handleSerialInputChange(index, e.target.value)}
+              />
+              <button type="button" onClick={() => handleRemoveSerial(index)}>Remove</button>
+            </div>
+          ))}
+          <button type="button" onClick={handleAddSerial} disabled={stock.quantity <= originalQuantity}>
+            Add Serial
+          </button>
+          <div>
+            <button type="submit">{isEditing ? 'Update' : 'Add'} Inventory</button>
+          </div>
+        </form>
+      </div>
     </>
-);
+  );
 }
 
 

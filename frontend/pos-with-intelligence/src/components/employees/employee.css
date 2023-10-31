@@ -45,4 +45,14 @@
   .employee-table button:hover {
     background-color: #0056b3;
   }
+  .add-employee-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+  }
   

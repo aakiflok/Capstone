@@ -35,11 +35,12 @@ const Employees: React.FC = () => {
   return (
     <>
       <Navbar></Navbar>
-      <Link to="/addEmployee" className="product-tile-link">
-            <button className="add-employee-button">Add Employee</button>
-          </Link>
+      
       
       <div className="employees-container">
+      <Link to="/addEmployee" className="product-tile-link">
+            <button className="add-employee-button">Add Employee</button>
+      </Link>
         <div className="content">
           <h2>Employees List</h2>
           <table className="employee-table">

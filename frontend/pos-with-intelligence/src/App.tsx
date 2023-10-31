@@ -6,8 +6,6 @@ import { Route, Routes } from "react-router-dom";
 import { Login } from "./components/login/login";
 
 import { RequireAuth } from "react-auth-kit";
-import AdminDashboard from "./components/admin/dashboard/adminDashboard";
-import StaffDashboard from "./components/staff/dashboard/staffDashboard";
 import Products from "./components/products";
 import Profile from "./components/profile";
 import ProductView from "./components/itemView/productView/productView";
@@ -20,6 +18,7 @@ import EmployeeView from "./components/itemView/employeeView/employeeView";
 import CustomerView from "./components/itemView/customerView/customerView";
 import AddEditEmployeeForm from "./components/forms/employeeForms/addEditEmployeeForm";
 import AddEditInventoryForm from "./components/forms/inverntoryForms/addEditInventoryForm";
+import AddEditCustomerForm from "./components/forms/customerForms/addEditCustomerForm";
 
 
 const AppContainer = styled.div`
@@ -49,6 +48,8 @@ function App() {
         <Route path="/employees" element={<RequireAuth loginPath="/login"><Employees /></RequireAuth>}/>
         <Route path="/customers" element={<RequireAuth loginPath="/login"><Customers /></RequireAuth>}/>
         <Route path="/customers/:id" element={<RequireAuth loginPath="/login"><CustomerView /></RequireAuth>}/>
+        
+        <Route path="//customers/edit/:id" element={<RequireAuth loginPath="/login"><AddEditCustomerForm /></RequireAuth>}/>
         <Route path="/employees/:id" element={<RequireAuth loginPath="/login"><EmployeeView /></RequireAuth>}/>
         <Route path="/inventory/:id" element={<RequireAuth loginPath="/login"><InventoryView /></RequireAuth>}/>
         <Route path="/editInventory/:id" element={<RequireAuth loginPath="/login"><AddEditInventoryForm /></RequireAuth>}/>

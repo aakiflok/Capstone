@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './nav.css';
 import Cookies from 'js-cookie';
 
 const Navbar = () => {
   const [user, setUser] = useState<any | null>(null); // Use the appropriate type for your user object
-
+  const navigate = useNavigate();
   useEffect(() => {
     const token = Cookies.get('_auth');
     const authState = Cookies.get('_auth_state');
@@ -16,6 +17,11 @@ const Navbar = () => {
     }
   }, []);
 
+  const handleLogout = async() => {
+    // 1. Clear the authentication cookie
+    document.cookie = "_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    navigate("/login");
+  };
   // Define user roles (you may have a more structured way to handle roles)
   const isAdmin = user && user.role === 'admin';
   const isSalesStaff = user && user.role === 'sales_staff';
@@ -34,7 +40,7 @@ const Navbar = () => {
         </div>
         <div className="navbar__right">
           <Link to="/profile" className="navbar__link">Profile</Link>
-          <Link to="/logout" className="navbar__link">Logout</Link>
+          <a className="navbar__link" onClick={handleLogout}>Logout</a>
         </div>
       </div>
     </nav>

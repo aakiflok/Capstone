@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 const customerModel = new mongoose.Schema({
-    customer_id: { type: Number, required: true, unique: true },
     first_name: { type: String, required: true },
     last_name: { type: String, required: true },
     address: String,
