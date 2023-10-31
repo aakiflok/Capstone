@@ -58,7 +58,8 @@ router.get('/stock/:id', async (req: Request, res: Response) => {
 // Update a stock record
 router.patch('/stock/:id', async (req: Request, res: Response) => {
   try {
-    const stock = await Stock.findById(req.params.id);
+    const stockId = req.params.id;
+    const stock = await Stock.findById(stockId);
     if (!stock) {
       return res.status(404).json({ message: 'Stock record not found' });
     }
@@ -79,7 +80,6 @@ router.patch('/stock/:id', async (req: Request, res: Response) => {
   }
 });
 
-//get quantity
 // Get quantity
 router.get('/stock/quantity/:productId', async (req: Request, res: Response) => {
   try {

@@ -35,5 +35,20 @@ router.delete('/unit-serial/:id', async (req: Request, res: Response) => {
     res.status(500).json({ message: err.message });
   }
 });
+// Add a new unit serial record
+router.post('/addUnitSerial', async (req: Request, res: Response) => {
+  try {
+    const newSerial = new Unit_Serial({
+      stock_id: req.body.stock_id,
+      serial_number: req.body.serial_number,
+      isAvailable: req.body.isAvailable
+    });
+
+    const savedSerial = await newSerial.save();
+    res.status(201).json(savedSerial);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 export { router as unitSerialRoute };
