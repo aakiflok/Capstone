@@ -75,7 +75,7 @@ router.delete('/customers/:id', getCustomer, (req, res) => __awaiter(void 0, voi
 function getCustomer(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const customer = yield CustomerModel_1.Customers.$where(req.params.id);
+            const customer = yield CustomerModel_1.Customers.findById(req.params.id);
             if (customer == null) {
                 return res.status(404).json({ message: 'Customer not found' });
             }

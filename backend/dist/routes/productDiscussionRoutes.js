@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.productDicussionRoute = void 0;
 const express_1 = __importDefault(require("express"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const DiscussionModel_1 = require("../models/DiscussionModel");
 const router = express_1.default.Router();
 exports.productDicussionRoute = router;
@@ -22,11 +23,17 @@ router.post('/products/:productId/messages/:userId', (req, res) => __awaiter(voi
     try {
         const { productId, userId } = req.params;
         const { message } = req.body;
+        if (!mongoose_1.default.Types.ObjectId.isValid(productId) || !mongoose_1.default.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: 'Invalid Product or User ID format.' });
+        }
+        // Convert to ObjectId
+        const productObjectId = new mongoose_1.default.Types.ObjectId(productId);
+        const userObjectId = new mongoose_1.default.Types.ObjectId(userId);
         // Log the received data for debugging
         console.log('Received Data:', { productId, userId, message });
         const productMessage = new DiscussionModel_1.Discussions({
-            product_id: productId,
-            user_id: userId,
+            product_id: productObjectId,
+            user_id: userObjectId,
             message,
         });
         yield productMessage.save();
@@ -44,7 +51,11 @@ router.post('/products/:productId/messages/:userId', (req, res) => __awaiter(voi
 router.get('/products/:productId/messages', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { productId } = req.params;
-        const messages = yield DiscussionModel_1.Discussions.find({ product_id: productId }).sort({ createdAt: 'asc' });
+        if (!mongoose_1.default.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({ message: 'Invalid Product ID format.' });
+        }
+        const productObjectId = new mongoose_1.default.Types.ObjectId(productId);
+        const messages = yield DiscussionModel_1.Discussions.find({ product_id: productObjectId }).sort({ createdAt: 'asc' });
         res.status(200).json(messages);
     }
     catch (error) {

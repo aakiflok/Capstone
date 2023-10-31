@@ -21,6 +21,7 @@ const userRoutes_1 = require("./routes/userRoutes");
 const stockRoute_1 = require("./routes/stockRoute");
 const productRoutes_1 = require("./routes/productRoutes");
 const productDiscussionRoutes_1 = require("./routes/productDiscussionRoutes");
+const serialRoutes_1 = require("./routes/serialRoutes");
 const app = (0, express_1.default)();
 exports.app = app;
 app.set('trust proxy', true);
@@ -31,6 +32,7 @@ app.use(userRoutes_1.userRoute);
 app.use(stockRoute_1.stockRoute);
 app.use(productRoutes_1.productRoute);
 app.use(productDiscussionRoutes_1.productDicussionRoute);
+app.use(serialRoutes_1.unitSerialRoute);
 app.all('*', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send('all');
 }));

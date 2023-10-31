@@ -27,19 +27,26 @@ const upload = multer({ storage: storage });
 router.post('/products', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Get product data from the request body
-        const { id, name, price, category, description, image_uri } = req.body;
+        const { name, price, category, description, image_uri, discontinued } = req.body;
         // Create a new product instance
         const newProduct = new ProductModel_1.Product({
-            id,
             name,
             price,
             category,
             description,
             image_uri,
+            discontinued
         });
         // Save the new product to the database
         const savedProduct = yield newProduct.save();
-        res.status(201).json(savedProduct);
+        const newStock = new StockModel_1.Stock({
+            product_id: savedProduct._id,
+            quantity: 0,
+            location: 'not stock' // You can adjust this as per your requirements
+        });
+        console.log(newStock);
+        yield newStock.save(); // Save the stock entry
+        res.status(201).json(savedProduct._id);
     }
     catch (err) {
         res.status(500).json({ message: err.message });
@@ -88,7 +95,7 @@ router.get('/products', (req, res) => __awaiter(void 0, void 0, void 0, function
 router.get('/products/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const productId = req.params.id;
-        const product = yield ProductModel_1.Product.findOne({ id: productId });
+        const product = yield ProductModel_1.Product.findById(productId);
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
@@ -127,14 +134,24 @@ router.patch('/products/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
 // Delete a product
 router.delete('/products/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        // Fetch the stock record corresponding to the product
+        const stock = yield StockModel_1.Stock.findOne({ product_id: req.params.id });
+        if (!stock) {
+            return res.status(404).json({ message: 'Stock record not found for the given product' });
+        }
+        // Check stock quantity
+        if (stock.quantity > 0) {
+            return res.status(400).json({ message: 'Cannot delete product with stock quantity greater than zero' });
+        }
+        // If stock quantity is zero, delete the product
         const product = yield ProductModel_1.Product.findById(req.params.id);
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
-        // Delete associated stock records if needed
-        yield StockModel_1.Stock.deleteMany({ product_id: product.id });
-        // await product.remove();
-        res.json({ message: 'Product deleted' });
+        yield product.deleteOne();
+        // Delete the corresponding stock record
+        yield stock.deleteOne();
+        res.json({ message: 'Product and corresponding stock record deleted' });
     }
     catch (err) {
         res.status(500).json({ message: err.message });

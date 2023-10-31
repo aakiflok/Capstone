@@ -21,8 +21,19 @@ const router = express_1.default.Router();
 exports.userRoute = router;
 // Create a new user
 router.post('/addUser', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("here 1");
     try {
-        const user = new UserModel_1.User(req.body);
+        const { first_name, last_name, birthdate, address, username, password, email, role, joining_date } = req.body;
+        const user = new UserModel_1.User({ first_name,
+            last_name,
+            birthdate,
+            address,
+            username,
+            password,
+            email,
+            role,
+            joining_date });
+        // Set the users properties that came in the request body
         const savedUser = yield user.save();
         res.status(201).json(savedUser);
     }
