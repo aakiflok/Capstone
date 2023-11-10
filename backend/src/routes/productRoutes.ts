@@ -33,7 +33,6 @@ router.post('/products', async (req: Request, res: Response) => {
       quantity: 0,
       location: 'not stock' // You can adjust this as per your requirements
     });
-    console.log(newStock);
 
     await newStock.save(); // Save the stock entry
     res.status(201).json(savedProduct._id);

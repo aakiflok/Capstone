@@ -1,7 +1,14 @@
 const invoiceModel = new mongoose.Schema({
-    invoice_id: { type: Number, required: true, unique: true, autoIncrement: true },
-    customer_id: { type: Number, required: true },
-    user_id: Number,
+    customer_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+      required: true,
+    },
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+      required: true,
+    },
     total: { type: Number, required: true },
     delivery_status: { type: Boolean, required: true },
     date: { type: Date, required: true },
@@ -9,4 +16,5 @@ const invoiceModel = new mongoose.Schema({
     payment_id: { type: Number, required: true },
   });
 const Invoice = mongoose.model('Invoice', invoiceModel);
-module.exports = Invoice;
+
+export {Invoice}
