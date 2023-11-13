@@ -1,0 +1,52 @@
+.invoice-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.invoice-details p, .invoice-contact p {
+  margin: 5px 0;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.invoice-table th, .invoice-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.invoice-summary {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.invoice-totals p {
+  margin: 5px;
+}
+
+.invoice-actions button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Add additional styling as needed to match the design */
