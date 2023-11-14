@@ -94,7 +94,7 @@ const ProductView: React.FC = () => {
       <Navbar />
       <div className="product-view-container">
         <div className="product-header">
-          <img src={img1} alt={product.name} className="product-main-image" />
+          <img src={product.image_uri} alt={product.name} className="product-main-image" />
           <div className="product-details">
             <h2>{product.name}</h2>
             <p className="product-price">${product.price}</p>

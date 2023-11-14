@@ -1082,6 +1082,39 @@
   "resolved" "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
   "version" "0.2.3"
 
+"@cloudinary/html@^1.11.2":
+  "integrity" "sha512-IibBZliI7MOK3dxvz0WlsEyTIsqZhY3SiCBQM0CNwCKxn3N1TO8OgetfU26Now1lJbdoF5JQ8S7Cn6ZWNuU1KA=="
+  "resolved" "https://registry.npmjs.org/@cloudinary/html/-/html-1.11.2.tgz"
+  "version" "1.11.2"
+  dependencies:
+    "@types/lodash.clonedeep" "^4.5.6"
+    "@types/lodash.debounce" "^4.0.6"
+    "@types/node" "^14.14.10"
+    "lodash.clonedeep" "^4.5.0"
+    "lodash.debounce" "^4.0.8"
+    "typescript" "^4.1.2"
+
+"@cloudinary/react@^1.11.2":
+  "integrity" "sha512-ZnVthMW7TExLMPmyven4N7EVr2oX2yZqnHn6EHBlni9iM0AZd6qtR8R5/SscxNLNwgBieWuvmejUlUT4LqPpMg=="
+  "resolved" "https://registry.npmjs.org/@cloudinary/react/-/react-1.11.2.tgz"
+  "version" "1.11.2"
+  dependencies:
+    "@cloudinary/html" "^1.11.2"
+
+"@cloudinary/transformation-builder-sdk@^1.7.0":
+  "integrity" "sha512-/QLSDDI+rfYH3bFH+DpgEk8NgSoeqwiea9GW5VXplcpebQOOcFqOzNFM6Hlik3PDqq4JMP4s3E7BoPZ1Rdk/IQ=="
+  "resolved" "https://registry.npmjs.org/@cloudinary/transformation-builder-sdk/-/transformation-builder-sdk-1.8.0.tgz"
+  "version" "1.8.0"
+  dependencies:
+    "@cloudinary/url-gen" "^1.7.0"
+
+"@cloudinary/url-gen@^1.13.0", "@cloudinary/url-gen@^1.7.0":
+  "integrity" "sha512-p7ASCX2fZw1JWtMG2ADd/Y0TfvE5SX9v0TDJDlzXX3OlNxLSuqzLWGgj5oJD4ZTo62FdxH24N8HPZ7NXEXtj5g=="
+  "resolved" "https://registry.npmjs.org/@cloudinary/url-gen/-/url-gen-1.13.0.tgz"
+  "version" "1.13.0"
+  dependencies:
+    "@cloudinary/transformation-builder-sdk" "^1.7.0"
+
 "@csstools/normalize.css@*":
   "integrity" "sha512-M0qqxAcwCsIVfpFQSlGN5XjXWu8l5JDZN+fPt1LeW5SZexQTgnaEvgXAY+CeygRw0EeppWHi12JxESWiWrB0Sg=="
   "resolved" "https://registry.npmjs.org/@csstools/normalize.css/-/normalize.css-12.0.0.tgz"
@@ -2035,6 +2068,25 @@
   "resolved" "https://registry.npmjs.org/@types/json5/-/json5-0.0.29.tgz"
   "version" "0.0.29"
 
+"@types/lodash.clonedeep@^4.5.6":
+  "integrity" "sha512-19429mWC+FyaAhOLzsS8kZUsI+/GmBAQ0HFiCPsKGU+7pBXOQWhyrY6xNNDwUSX8SMZMJvuFVMF9O5dQOlQK9Q=="
+  "resolved" "https://registry.npmjs.org/@types/lodash.clonedeep/-/lodash.clonedeep-4.5.9.tgz"
+  "version" "4.5.9"
+  dependencies:
+    "@types/lodash" "*"
+
+"@types/lodash.debounce@^4.0.6":
+  "integrity" "sha512-Ma5JcgTREwpLRwMM+XwBR7DaWe96nC38uCBDFKZWbNKD+osjVzdpnUSwBcqCptrp16sSOLBAUb50Car5I0TCsQ=="
+  "resolved" "https://registry.npmjs.org/@types/lodash.debounce/-/lodash.debounce-4.0.9.tgz"
+  "version" "4.0.9"
+  dependencies:
+    "@types/lodash" "*"
+
+"@types/lodash@*":
+  "integrity" "sha512-y9euML0cim1JrykNxADLfaG0FgD1g/yTHwUs/Jg9ZIU7WKj2/4IW9Lbb1WZbvck78W/lfGXFfe+u2EGfIJXdLQ=="
+  "resolved" "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.201.tgz"
+  "version" "4.14.201"
+
 "@types/mime@*":
   "integrity" "sha512-Y4XFY5VJAuw0FgAqPNd6NNoV44jbq9Bz2L7Rh/J6jLTiHBSBJa9fxqQIvkIld4GsoDOcCbvzOUAbLPsSKKg+uA=="
   "resolved" "https://registry.npmjs.org/@types/mime/-/mime-3.0.1.tgz"
@@ -2044,6 +2096,11 @@
   "integrity" "sha512-uMVxJ111wpHzkx/vshZFb6Qni3BOMnlWLq7q9jrwej7Yw/KvjsEbpxCCxw+hLKxexFMc8YmpG8J9tnEe/rKsIg=="
   "resolved" "https://registry.npmjs.org/@types/node/-/node-16.11.58.tgz"
   "version" "16.11.58"
+
+"@types/node@^14.14.10":
+  "integrity" "sha512-fAtCfv4jJg+ExtXhvCkCqUKZ+4ok/JQk01qDKhL5BDDoS3AxKXhV5/MAVUZyQnSEd2GT92fkgZl0pz0Q0AzcIQ=="
+  "resolved" "https://registry.npmjs.org/@types/node/-/node-14.18.63.tgz"
+  "version" "14.18.63"
 
 "@types/parse-json@^4.0.0":
   "integrity" "sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA=="
@@ -6617,6 +6674,11 @@
   "resolved" "https://registry.npmjs.org/lodash-es/-/lodash-es-4.17.21.tgz"
   "version" "4.17.21"
 
+"lodash.clonedeep@^4.5.0":
+  "integrity" "sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ=="
+  "resolved" "https://registry.npmjs.org/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz"
+  "version" "4.5.0"
+
 "lodash.debounce@^4.0.8":
   "integrity" "sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow=="
   "resolved" "https://registry.npmjs.org/lodash.debounce/-/lodash.debounce-4.0.8.tgz"
@@ -8239,7 +8301,7 @@
     "@babel/runtime" "^7.0.0"
     "memoize-one" ">=3.1.1 <6"
 
-"react@^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0", "react@^15.3.0 || ^16.0.0 || ^17.0.0 || ^18.0.0", "react@^15.3.0 || ^16.0.0-alpha", "react@^15.3.0 || ^16.0.0-alpha || ^17.0.0", "react@^16.3.0-0 || ^17.0.0-0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0-0 || ^17.0.0-0 || ^18.0.0-0", "react@^18.0.0", "react@^18.2.0", "react@>= 16", "react@>= 16.8.0", "react@>= 16.8.0 < 19", "react@>=0.14.0", "react@>=16.8", "react@>=16.8.0":
+"react@^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0", "react@^15.3.0 || ^16.0.0 || ^17.0.0 || ^18.0.0", "react@^15.3.0 || ^16.0.0-alpha", "react@^15.3.0 || ^16.0.0-alpha || ^17.0.0", "react@^16.3.0 || ^17.0.0 || ^18.0.0", "react@^16.3.0-0 || ^17.0.0-0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0-0 || ^17.0.0-0 || ^18.0.0-0", "react@^18.0.0", "react@^18.2.0", "react@>= 16", "react@>= 16.8.0", "react@>= 16.8.0 < 19", "react@>=0.14.0", "react@>=16.8", "react@>=16.8.0":
   "integrity" "sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ=="
   "resolved" "https://registry.npmjs.org/react/-/react-18.2.0.tgz"
   "version" "18.2.0"
@@ -9393,7 +9455,7 @@
   dependencies:
     "is-typedarray" "^1.0.0"
 
-"typescript@^3.2.1 || ^4", "typescript@^4.8.3", "typescript@>= 2.7", "typescript@>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta":
+"typescript@^3.2.1 || ^4", "typescript@^4.1.2", "typescript@^4.8.3", "typescript@>= 2.7", "typescript@>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta":
   "integrity" "sha512-goMHfm00nWPa8UvR/CPSvykqf6dVV8x/dp0c5mFTMTIu0u0FlGWRioyy7Nn0PGAdHxpJZnuO/ut+PpQ8UiHAig=="
   "resolved" "https://registry.npmjs.org/typescript/-/typescript-4.8.3.tgz"
   "version" "4.8.3"

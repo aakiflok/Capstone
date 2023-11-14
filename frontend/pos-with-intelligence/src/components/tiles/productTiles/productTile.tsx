@@ -11,7 +11,7 @@ const ProductTile: React.FC<ProductTileProps> = ({ product, onClick }) => {
   return (
     <div className="product-tile">
       <div className="product-image">
-        <img src={img1} alt={product.name} />
+        <img src={product.image_uri} alt={product.name} />
       </div>
       <div className="product-details">
         <h3>{product.name}</h3>

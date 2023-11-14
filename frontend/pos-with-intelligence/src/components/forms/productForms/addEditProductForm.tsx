@@ -9,7 +9,8 @@ const AddEditProductForm = () => {
   const { id } = useParams(); // Get the product ID from the route params
   const isEditing = !!id; // Determine if it's an edit operation
   const navigate = useNavigate();
-  
+  const [uploadingImage, setUploadingImage] = useState(false);
+
   const [product, setProduct] = useState({
     name: '',
     price: '',
@@ -58,7 +59,7 @@ const AddEditProductForm = () => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-
+    console.log('Submitting product:', product);
     if (isEditing) {
       // If it's an edit operation, send a PUT request to update the product
       axios.put(`http://localhost:3001/products/${id}`, product)
@@ -82,6 +83,39 @@ const AddEditProductForm = () => {
         .catch((error) => {
           // Handle error
           console.error('Error adding product:', error);
+        });
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files[0]) {
+      setUploadingImage(true);
+  
+      axios.get<{ signature: string; timestamp: number }>('http://localhost:3001/get-signature')
+        .then(response => {
+          const { signature, timestamp } = response.data;
+          const formData = new FormData();
+          formData.append('file', files[0]);
+          formData.append('timestamp', timestamp.toString());
+          formData.append('signature', signature);
+          formData.append('api_key', '278171197627713'); // Make sure to replace with your actual API key
+  
+          // Post to Cloudinary upload URL
+          axios.post('https://api.cloudinary.com/v1_1/dxrohnluu/image/upload', formData)
+            .then(uploadResponse => {
+              const { secure_url } = uploadResponse.data;
+              setProduct({ ...product, image_uri: secure_url });
+              setUploadingImage(false);
+            })
+            .catch(uploadError => {
+              console.error('Error uploading image:', uploadError);
+              setUploadingImage(false);
+            });
+        })
+        .catch(signatureError => {
+          console.error('Error fetching signature:', signatureError);
+          setUploadingImage(false);
         });
     }
   };
@@ -137,15 +171,23 @@ const AddEditProductForm = () => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="image_uri">Image URI</label>
+            <label htmlFor="image">Image</label>
             <input
-              type="url"
-              id="image_uri"
-              name="image_uri"
-              value={product.image_uri}
-              onChange={handleChange}
-              required
+              type="file"
+              id="image"
+              name="image"
+              onChange={handleImageUpload}
+              disabled={uploadingImage}
             />
+            {uploadingImage && <p>Uploading image...</p>}
+          </div>
+          <div className="form-group">
+            {product.image_uri && (
+              <>
+                <label>Image Preview</label>
+                <img src={product.image_uri} alt="Product" style={{ maxWidth: '200px', maxHeight: '200px' }} />
+              </>
+            )}
           </div>
           <div className="form-group">
             <label>Discontinued</label>
