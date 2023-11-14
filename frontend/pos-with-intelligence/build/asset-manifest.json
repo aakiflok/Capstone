@@ -1,16 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.e628ccc1.css",
-    "main.js": "/static/js/main.4e0c6d6f.js",
-    "static/js/787.870dd39f.chunk.js": "/static/js/787.870dd39f.chunk.js",
-    "static/media/LG_TV_1.jpg": "/static/media/LG_TV_1.d338942e969f475432b3.jpg",
+    "main.css": "/static/css/main.dd10c604.css",
+    "main.js": "/static/js/main.3ffab90b.js",
+    "static/js/787.607c2a2f.chunk.js": "/static/js/787.607c2a2f.chunk.js",
     "index.html": "/index.html",
-    "main.e628ccc1.css.map": "/static/css/main.e628ccc1.css.map",
-    "main.4e0c6d6f.js.map": "/static/js/main.4e0c6d6f.js.map",
-    "787.870dd39f.chunk.js.map": "/static/js/787.870dd39f.chunk.js.map"
+    "main.dd10c604.css.map": "/static/css/main.dd10c604.css.map",
+    "main.3ffab90b.js.map": "/static/js/main.3ffab90b.js.map",
+    "787.607c2a2f.chunk.js.map": "/static/js/787.607c2a2f.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e628ccc1.css",
-    "static/js/main.4e0c6d6f.js"
+    "static/css/main.dd10c604.css",
+    "static/js/main.3ffab90b.js"
   ]
 }
