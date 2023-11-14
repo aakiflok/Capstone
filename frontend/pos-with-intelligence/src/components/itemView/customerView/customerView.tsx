@@ -12,7 +12,7 @@ const CustomerView: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/customers/${id}`);
+        const response = await axios.get(`https://pos-crud.onrender.com//customers/${id}`);
 
         if (isMounted) {
           setSelectedCustomer(response.data);

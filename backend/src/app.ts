@@ -11,7 +11,7 @@ import invoiceRoutes from './routes/invoiceRoutes';
 const app = express();
 app.set('trust proxy', true);
 app.use(json());
-app.use(cors({origin: 'http://localhost:3000'}));
+app.use(cors({origin: 'https://pos-system-ig9m.onrender.com/'}));
 app.use(customerRoute);
 app.use(userRoute);
 app.use(stockRoute);
