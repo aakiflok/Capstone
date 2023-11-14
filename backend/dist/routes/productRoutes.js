@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,22 +31,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.productRoute = void 0;
-const express_1 = __importDefault(require("express"));
 const ProductModel_1 = require("./../models/ProductModel");
 const StockModel_1 = require("./../models/StockModel");
-const router = express_1.default.Router();
+const cloudinary = __importStar(require("cloudinary"));
+const express_1 = require("express");
+cloudinary.v2.config({
+    cloud_name: 'dxrohnluu',
+    api_key: '278171197627713',
+    api_secret: 'I92bDNPLwfsA5Ba2KFcw9LLRvgg',
+    secure: true
+});
+const router = (0, express_1.Router)();
 exports.productRoute = router;
-const azure = require('azure-storage');
-const blobService = azure.createBlobService('posproject', 'KYTgOoFQL+ZtpAnfQFOi3waffpKAw5Zc4KeSrXH/hIqtdjzirdjo02iWZu2w1lvfQcFyUqTYB6ZE+ASt+RkWwg==');
-console.log(blobService);
-const multer = require('multer');
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 router.post('/products', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Get product data from the request body
@@ -44,41 +65,11 @@ router.post('/products', (req, res) => __awaiter(void 0, void 0, void 0, functio
             quantity: 0,
             location: 'not stock' // You can adjust this as per your requirements
         });
-        console.log(newStock);
         yield newStock.save(); // Save the stock entry
         res.status(201).json(savedProduct._id);
     }
     catch (err) {
         res.status(500).json({ message: err.message });
-    }
-}));
-router.post('/upload', upload.single('image'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const containerName = 'productStorage'; // Replace with your container name
-        const blobName = req.file.originalname;
-        const buffer = req.file.buffer;
-        // Check if the container exists, and create it if not
-        blobService.createContainerIfNotExists(containerName, { publicAccessLevel: 'blob' }, (createError) => {
-            if (!createError) {
-                // Container either exists or was successfully created
-                // Upload the blob to the container
-                blobService.createBlockBlobFromText(containerName, blobName, buffer, buffer.length, (uploadError, _result, _response) => {
-                    if (!uploadError) {
-                        const imageUrl = blobService.getUrl(containerName, blobName);
-                        res.status(201).json({ imageUrl });
-                    }
-                    else {
-                        res.status(500).json({ error: uploadError });
-                    }
-                });
-            }
-            else {
-                res.status(500).json({ error: createError });
-            }
-        });
-    }
-    catch (error) {
-        res.status(500).json({ message: 'Internal Server Error' });
     }
 }));
 // Get all products
@@ -105,6 +96,19 @@ router.get('/products/:id', (req, res) => __awaiter(void 0, void 0, void 0, func
         res.status(500).json({ message: err.message });
     }
 }));
+router.get('/get-signature', (req, res) => {
+    const timestamp = Math.round(new Date().getTime() / 1000);
+    // Check if api_secret is defined and assert its type
+    const apiSecret = cloudinary.v2.config().api_secret;
+    // Ensure that api_secret is defined
+    if (!apiSecret) {
+        return res.status(500).json({ message: "Cloudinary API secret is undefined." });
+    }
+    const signature = cloudinary.v2.utils.api_sign_request({
+        timestamp: timestamp,
+    }, apiSecret);
+    res.json({ signature, timestamp });
+});
 // Update a product
 router.patch('/products/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
