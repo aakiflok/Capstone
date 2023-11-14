@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './invoiceView.css'
+import Navbar from '../../navigation/nav';
 
 const InvoiceView: React.FC = () => {
   const [invoiceData, setInvoiceData] =  useState<any>(null);
@@ -28,19 +29,21 @@ const InvoiceView: React.FC = () => {
   const invoiceDate = new Date(invoiceData?.date).toLocaleDateString('en-US');
 
   return (
+    <> 
+    <Navbar></Navbar>
     <div className="invoice-container">
       <div className="invoice-header">
         <div className="invoice-details">
-          <p><strong>Name:</strong> {invoiceData?.customerName}</p>
-          <p><strong>Delivery Status:</strong> {invoiceData?.deliveryStatus}</p>
-          <p><strong>Sales Staff:</strong> {invoiceData.salesStaff}</p>
+          <p><strong>Name:</strong> {invoiceData?.customer_id.first_name}</p>
+          <p><strong>Delivery Status:</strong> {invoiceData?.delivery_status ? 'Delivered' : 'In Progress'}</p>
+          <p><strong>Sales Staff:</strong> {invoiceData.user_id.first_name} {invoiceData.user_id.last_name}</p>
           <p><strong>Date:</strong> {invoiceDate}</p>
-          <p><strong>Payment Status:</strong> {invoiceData.paymentStatus}</p>
+          <p><strong>Payment Status:</strong> {invoiceData.payment_status ? 'Paid': 'Pending'}</p>
         </div>
         <div className="invoice-contact">
-          <p><strong>Address:</strong> {invoiceData.address}</p>
-          <p><strong>Phone:</strong> {invoiceData.phone}</p>
-          <p><strong>Email:</strong> {invoiceData.email}</p>
+          <p><strong>Address:</strong> {invoiceData.customer_id.address} {invoiceData.customer_id.state} {invoiceData.customer_id.city} {invoiceData.customer_id.zip_code}</p>
+          <p><strong>Phone:</strong> {invoiceData.customer_id.phone_number}</p>
+          <p><strong>Email:</strong> {invoiceData.customer_id.email}</p>
         </div>
       </div>
 
@@ -53,15 +56,15 @@ const InvoiceView: React.FC = () => {
               <th>Price</th>
             </tr>
           </thead>
-          {/* <tbody>
-            {invoiceData.items.map(item => (
-              <tr key={item.id}>
-                <td>{item.name}</td>
+          <tbody>
+            {invoiceData.items.map((item :any) => (
+              <tr key={item._id}> 
+                <td>{item.product_id.name}</td>
                 <td>{item.quantity}</td>
-                <td>${item.price}</td>
+                <td>${item.product_id.price}</td>
               </tr>
             ))}
-          </tbody> */}
+          </tbody>
         </table>
       </div>
 
@@ -76,6 +79,7 @@ const InvoiceView: React.FC = () => {
         <button>Edit Invoice</button>
       </div>
     </div>
+    </>
   );
 };
 

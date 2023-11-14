@@ -5,11 +5,7 @@ const usersModel = new mongoose.Schema({
     birthdate: Date,
     address: String,
     username: String,
-    password: {
-      type: String,
-      required: true,
-      select: false, // This will prevent the password from being included in query results by default
-    },
+    password: String,
     email: String,
     role: String,
     joining_date: Date,

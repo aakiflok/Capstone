@@ -1,9 +1,9 @@
+import mongoose from "mongoose";
 const invoiceItemModel= new mongoose.Schema({
-    invoice_item_id: { type: Number, required: true, unique: true, autoIncrement: true },
-    invoice_id: { type: Number, required: true },
-    product_id: Number,
+    invoice_id: {    type: mongoose.Schema.Types.ObjectId, ref: 'Invoice', required: true },
+    product_id: {   type: mongoose.Schema.Types.ObjectId, ref: 'Product', required:true},
     quantity: { type: Number, required: true },
   });
   
   const Invoice_Item = mongoose.model('Invoice_Item', invoiceItemModel);
-  module.exports = Invoice_Item;
+  export{Invoice_Item};

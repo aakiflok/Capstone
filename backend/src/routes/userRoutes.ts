@@ -7,7 +7,6 @@ const router = express.Router();
 
 // Create a new user
 router.post('/addUser', async (req: Request, res: Response) => {
-  console.log("here 1");
   try {
     const {
       first_name,
