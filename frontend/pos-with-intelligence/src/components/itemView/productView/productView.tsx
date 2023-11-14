@@ -19,11 +19,11 @@ const ProductView: React.FC = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`https://pos-crud.onrender.com//products/${id}`);
+        const response = await axios.get(`https://pos-crud.onrender.com/products/${id}`);
         setProduct(response.data);
         
         // Fetch the quantity of the product
-        const quantityResponse = await axios.get(`https://pos-crud.onrender.com//stock/quantity/${id}`);
+        const quantityResponse = await axios.get(`https://pos-crud.onrender.com/stock/quantity/${id}`);
         setQuantity(quantityResponse.data.quantity);
       } catch (err) {
         console.log("Error: ", err);
@@ -32,7 +32,7 @@ const ProductView: React.FC = () => {
 
     const fetchMessages = async () => {
       try {
-        const response = await axios.get(`https://pos-crud.onrender.com//products/${id}/messages`);
+        const response = await axios.get(`https://pos-crud.onrender.com/products/${id}/messages`);
         setMessages(response.data);
       } catch (error) {
         console.error(error);
@@ -66,7 +66,7 @@ const ProductView: React.FC = () => {
 
   const handleSubmitMessage = async () => {
     try {
-      const response = await axios.post(`https://pos-crud.onrender.com//products/${id}/messages/${user._id}`, {
+      const response = await axios.post(`https://pos-crud.onrender.com/products/${id}/messages/${user._id}`, {
         message: newMessage,
       });
   
@@ -82,7 +82,7 @@ const ProductView: React.FC = () => {
 
   const handleDeleteProduct = async () => {
     try {
-      await axios.delete(`https://pos-crud.onrender.com//products/${id}`);
+      await axios.delete(`https://pos-crud.onrender.com/products/${id}`);
       navigate('/products');
     } catch (error) {
       console.error(error);

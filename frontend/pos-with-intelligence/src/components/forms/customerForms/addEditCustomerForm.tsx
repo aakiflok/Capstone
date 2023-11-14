@@ -26,7 +26,7 @@ const AddEditCustomerForm: React.FC = () => {
 
     useEffect(() => {
         if (isEditing) {
-            axios.get(`https://pos-crud.onrender.com//customers/${id}`)
+            axios.get(`https://pos-crud.onrender.com/customers/${id}`)
                 .then((response) => {
                     setCustomer(response.data);
                 })
@@ -44,7 +44,7 @@ const AddEditCustomerForm: React.FC = () => {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (isEditing) {
-            axios.patch(`https://pos-crud.onrender.com//customers/${id}`, customer)
+            axios.patch(`https://pos-crud.onrender.com/customers/${id}`, customer)
                 .then(response => {
                     console.log('Customer updated:', response.data);
                 })
@@ -52,7 +52,7 @@ const AddEditCustomerForm: React.FC = () => {
                     console.error('Error updating customer:', error);
                 });
         } else {
-            axios.post('https://pos-crud.onrender.com//customers', customer)
+            axios.post('https://pos-crud.onrender.com/customers', customer)
                 .then(response => {
                     console.log('Customer added:', response.data);
                 })

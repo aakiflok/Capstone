@@ -32,11 +32,11 @@ const AddEditInventoryForm: React.FC = () => {
 
   useEffect(() => {
     if (isEditing) {
-      axios.get(`https://pos-crud.onrender.com//stock/${id}`)
+      axios.get(`https://pos-crud.onrender.com/stock/${id}`)
         .then((response) => {
           setStock(response.data);
           setOriginalQuantity(response.data.quantity);
-          axios.get(`https://pos-crud.onrender.com//unit-serials-by-stock/${id}`)
+          axios.get(`https://pos-crud.onrender.com/unit-serials-by-stock/${id}`)
             .then((res) => {
               setUnitSerials(res.data);
             })
@@ -97,7 +97,7 @@ const AddEditInventoryForm: React.FC = () => {
         isAvailable: true,
       };
       try {
-        const response = await axios.post('https://pos-crud.onrender.com//addUnitSerial', newSerial);
+        const response = await axios.post('https://pos-crud.onrender.com/addUnitSerial', newSerial);
         console.log('Added new serial:', response.data);
       } catch (error) {
         console.error('Error adding new serial:', error);
@@ -108,7 +108,7 @@ const AddEditInventoryForm: React.FC = () => {
   const handleRemoveSerial = async (rowNumber: number) => {
     try {
       const serialToDelete = unitSerials[rowNumber];
-      const response = await axios.delete(`https://pos-crud.onrender.com//unit-serial/${serialToDelete}`);
+      const response = await axios.delete(`https://pos-crud.onrender.com/unit-serial/${serialToDelete}`);
       console.log('Deleted serial:', response.data);
       setUnitSerials(prev => prev.filter((_, idx) => idx !== rowNumber));
     } catch (error) {
@@ -119,7 +119,7 @@ const AddEditInventoryForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isEditing) {
-      axios.patch(`https://pos-crud.onrender.com//stock/${id}`, stock)
+      axios.patch(`https://pos-crud.onrender.com/stock/${id}`, stock)
         .then(response => {
           console.log('Stock updated:', response.data);
         })
@@ -127,7 +127,7 @@ const AddEditInventoryForm: React.FC = () => {
           console.error('Error updating stock:', error);
         });
     } else {
-      axios.post('https://pos-crud.onrender.com//addStock', stock)
+      axios.post('https://pos-crud.onrender.com/addStock', stock)
         .then(response => {
           console.log('Stock added:', response.data);
         })
