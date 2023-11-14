@@ -17,6 +17,7 @@ const express_1 = __importDefault(require("express"));
 const UserModel_1 = require("./../models/UserModel");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
+const cors_1 = __importDefault(require("cors"));
 const router = express_1.default.Router();
 exports.userRoute = router;
 // Create a new user
@@ -119,7 +120,7 @@ router.delete('/users/:id', getUser, (req, res) => __awaiter(void 0, void 0, voi
         res.status(500).json({ message: err.message });
     }
 }));
-router.post('/users/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/users/login', (0, cors_1.default)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, password } = req.body;
     if (!username || !password) {
         return res.status(400).json({ message: 'Username and password are required' });

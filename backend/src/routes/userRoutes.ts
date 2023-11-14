@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { User } from './../models/UserModel';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import cors from 'cors';
 
 const router = express.Router();
 
@@ -127,7 +128,7 @@ router.delete('/users/:id', getUser, async (req: Request, res: Response) => {
   }
 });
 
-router.post('/users/login', async (req: Request, res: Response) => {
+router.post('/users/login',cors(), async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
