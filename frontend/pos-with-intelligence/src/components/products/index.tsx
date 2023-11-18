@@ -41,7 +41,7 @@ const Products: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("https://pos-crud.onrender.com/products");
+        const response = await axios.get("http://localhost:3001/products");
         setProducts(response.data);
       } catch (err) {
         console.log("Error: ", err);

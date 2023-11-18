@@ -23,7 +23,7 @@ const AddEditProductForm = () => {
   useEffect(() => {
     // If it's an edit operation (ID is available in params), fetch the product data
     if (isEditing) {
-      axios.get(`https://pos-crud.onrender.com/products/${id}`)
+      axios.get(`http://localhost:3001/products/${id}`)
         .then((response) => {
           // Set the form fields with existing product data
           setProduct(response.data);
@@ -62,7 +62,7 @@ const AddEditProductForm = () => {
     console.log('Submitting product:', product);
     if (isEditing) {
       // If it's an edit operation, send a PUT request to update the product
-      axios.put(`https://pos-crud.onrender.com/products/${id}`, product)
+      axios.put(`http://localhost:3001/products/${id}`, product)
         .then((response) => {
           // Handle success
           alert('The product has been updated successfully');
@@ -75,7 +75,7 @@ const AddEditProductForm = () => {
         });
     } else {
       // If it's not an edit operation, send a POST request to create a new product
-      axios.post('https://pos-crud.onrender.com/products', product)
+      axios.post('http://localhost:3001/products', product)
         .then((response) => {
           // Handle success
           console.log('Product added:', response.data);
@@ -92,7 +92,7 @@ const AddEditProductForm = () => {
     if (files && files[0]) {
       setUploadingImage(true);
   
-      axios.get<{ signature: string; timestamp: number }>('https://pos-crud.onrender.com/get-signature')
+      axios.get<{ signature: string; timestamp: number }>('http://localhost:3001/get-signature')
         .then(response => {
           const { signature, timestamp } = response.data;
           const formData = new FormData();

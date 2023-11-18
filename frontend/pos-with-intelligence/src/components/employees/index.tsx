@@ -16,7 +16,7 @@ const Employees: React.FC = () => {
   const fetchEmployeeData = async () => {
     try {
       // Make a GET request to the '/users' route
-      const response = await axios.get('https://pos-crud.onrender.com/users');
+      const response = await axios.get('http://localhost:3001/users');
       setEmployeeList(response.data);
     } catch (error) {
       console.error('Error fetching employee data:', error);

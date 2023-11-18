@@ -23,7 +23,7 @@ const AddEditEmployeeForm = () => {
 
   useEffect(() => {
     if (isEditing) {
-      axios.get(`https://pos-crud.onrender.com/users/${id}`)
+      axios.get(`http://localhost:3001/users/${id}`)
         .then((response) => {
           setEmployee(response.data);
         })
@@ -45,7 +45,7 @@ const AddEditEmployeeForm = () => {
     e.preventDefault();
     console.log("prininting lode:"+isEditing);
     if (isEditing) {
-      axios.put(`https://pos-crud.onrender.com/updateUser/${id}`, employee)
+      axios.put(`http://localhost:3001/updateUser/${id}`, employee)
         .then((response) => {
           console.log('Employee updated:', response.data);
         })
@@ -54,7 +54,7 @@ const AddEditEmployeeForm = () => {
         });
     } else {
       console.log(employee);
-      axios.post('https://pos-crud.onrender.com/addUser', employee)
+      axios.post('http://localhost:3001/addUser', employee)
         .then((response) => {
           console.log('Employee added:', response.data);
         })

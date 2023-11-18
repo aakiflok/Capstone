@@ -11,7 +11,7 @@ const Invoice: React.FC = () => {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const response = await axios.get('https://pos-crud.onrender.com/invoices');
+        const response = await axios.get('http://localhost:3001/invoices');
         setInvoiceList(response.data);
       } catch (error) {
         console.error('Error fetching invoice data:', error);
@@ -54,7 +54,7 @@ const Invoice: React.FC = () => {
                   </td>
                   <td>{invoice.customerName}</td>
                   <td>${invoice.total}</td>
-                  <td>{new Date(invoice.dateIssued).toLocaleDateString()}</td>
+                  <td>{new Date(invoice.date).toLocaleDateString()}</td>
                   <td>{invoice.employeeName}</td>
                   <td>
                     <button onClick={() => handleViewClick(invoice)}>

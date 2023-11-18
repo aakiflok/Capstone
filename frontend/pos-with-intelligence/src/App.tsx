@@ -21,6 +21,7 @@ import AddEditInventoryForm from "./components/forms/inverntoryForms/addEditInve
 import AddEditCustomerForm from "./components/forms/customerForms/addEditCustomerForm";
 import Invoice from "./components/invoice/invoice";
 import InvoiceView from "./components/itemView/invoiceView/invoiceView";
+import AddEditInvoiceForm from "./components/forms/invoiceForms/addEditInvoiceForm";
 
 
 const AppContainer = styled.div`
@@ -52,6 +53,7 @@ function App() {
         <Route path="/customers/:id" element={<RequireAuth loginPath="/login"><CustomerView /></RequireAuth>}/>
         <Route path="/invoice" element={<RequireAuth loginPath="/login"><Invoice /></RequireAuth>}/>
         <Route path="/invoice/:id" element={<RequireAuth loginPath="/login"><InvoiceView /></RequireAuth>}/>
+        <Route path="/editInvoice/:id" element={<RequireAuth loginPath="/login"><AddEditInvoiceForm /></RequireAuth>}/>
         <Route path="/customers/edit/:id" element={<RequireAuth loginPath="/login"><AddEditCustomerForm /></RequireAuth>}/>
         <Route path="/employees/:id" element={<RequireAuth loginPath="/login"><EmployeeView /></RequireAuth>}/>
         <Route path="/inventory/:id" element={<RequireAuth loginPath="/login"><InventoryView /></RequireAuth>}/>

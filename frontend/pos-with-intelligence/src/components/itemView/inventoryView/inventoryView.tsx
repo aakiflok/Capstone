@@ -16,7 +16,7 @@ const InventoryView: React.FC = () => {
     const fetchData = async () => {
       try {
         // Send a GET request to your API using the 'id' from the URL
-        const response = await axios.get(`https://pos-crud.onrender.com/stock/${id}`);
+        const response = await axios.get(`http://localhost:3001/stock/${id}`);
 
         if (isMounted) {
           setSelectedProduct(response.data);

@@ -2,7 +2,7 @@ import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../../navigation/nav';
-import './invoiceForm.css';
+import './addEditInvoiceForm.css'
 
 // Define types for your invoice state
 interface InvoiceItem {
@@ -28,8 +28,8 @@ interface User {
 }
 
 interface Invoice {
-  customer: Customer;
-  user: User;
+  customer_id: Customer;
+  user_id: User;
   date: string;
   delivery_status: boolean;
   items: InvoiceItem[];
@@ -44,7 +44,7 @@ const AddEditInvoiceForm: React.FC = () => {
   const navigate = useNavigate();
   
   const [invoice, setInvoice] = useState<Invoice>({
-    customer: {
+    customer_id: {
       first_name: '',
       last_name: '',
       email: '',
@@ -54,7 +54,7 @@ const AddEditInvoiceForm: React.FC = () => {
       state: '',
       zip_code: '',
     },
-    user: {
+    user_id: {
       first_name: '',
       last_name: '',
       email: '',
@@ -69,7 +69,7 @@ const AddEditInvoiceForm: React.FC = () => {
 
   useEffect(() => {
     if (isEditing && id) {
-      axios.get(`/invoices/${id}`)
+      axios.get(`http://localhost:3001/invoices/${id}`)
         .then(response => {
           const fetchedInvoice: Invoice = response.data;
           setInvoice({
@@ -134,28 +134,107 @@ const AddEditInvoiceForm: React.FC = () => {
       <div className="invoice-form-container">
         <h2>{isEditing ? 'Edit Invoice' : 'Add an Invoice'}</h2>
         <form className="invoice-form" onSubmit={handleSubmit}>
-          {/* Form fields for invoice */}
-          {/* Example: */}
-          <input type="text" name="customer_id" value={invoice?.customer.first_name} onChange={handleChange} placeholder="Customer ID" />
-          <input type="text" name="user_id" value={invoice.user.first_name} onChange={handleChange} placeholder="Sales Staff ID" />
-          <input type="date" name="date" value={invoice?.date} onChange={handleChange} />
-          <input type="text" name="delivery_status" value={invoice.delivery_status ? 'Delivered' : 'In Progress'} onChange={handleChange} placeholder="Delivery Status" />
-          <input type="text" name="payment_status" value={invoice.payment_status? 'Paid': 'Pending'} onChange={handleChange} placeholder="Payment Status" />
-          <input type="number" name="tax" value={invoice.tax} onChange={handleChange} placeholder="Tax" />
-          <input type="number" name="total" value={invoice.total} onChange={handleChange} placeholder="Total" />
-          {invoice.items.map((item, index) => (
-            <div key={index}>
-              <input type="text" name="product_id" value={item.product_id} onChange={(e) => handleItemChange(index, e)} />
-              <input type="number" name="quantity" value={item.quantity} onChange={(e) => handleItemChange(index, e)} />
-              <button type="button" onClick={() => removeItem(index)}>Remove Item</button>
-            </div>
-          ))}
-          <button type="button" onClick={addItem}>Add Item</button>
+          {/* Customer Information */}
+          <section className="customer-info">
+            <h3>Customer Information</h3>
+            <label>
+              Name:
+              <input
+                type="text"
+                name="first_name"
+                value={invoice.customer_id.first_name}
+                onChange={(e) => handleNestedChange(e, 'customer_id')}
+                placeholder="First Name"
+              />
+            </label>
+            <label>
+              Email:
+              <input
+                type="email"
+                name="email"
+                value={invoice.customer_id.email}
+                onChange={(e) => handleNestedChange(e, 'customer_id')}
+                placeholder="Email"
+              />
+            </label>
+            {/* Add other customer fields here */}
+          </section>
+
+          {/* Sales Staff Information */}
+          <section className="user-info">
+            <h3>Sales Staff Information</h3>
+            <label>
+              Sales Staff:
+              <input
+                type="text"
+                name="first_name"
+                value={invoice.user_id.first_name}
+                onChange={(e) => handleNestedChange(e, 'user_id')}
+                placeholder="First Name"
+              />
+            </label>
+            {/* Add other user fields here */}
+          </section>
+
+          {/* Invoice Details */}
+          <section className="invoice-details">
+            <h3>Invoice Details</h3>
+            <label>
+              Date:
+              <input type="date" name="date" value={invoice.date} onChange={handleChange} />
+            </label>
+            <label>
+              Delivery Status:
+              <input
+                type="text"
+                name="delivery_status"
+                value={invoice.delivery_status ? 'Delivered' : 'In Progress'}
+                onChange={handleChange}
+              />
+            </label>
+            <label>
+              Payment Status:
+              <input
+                type="text"
+                name="payment_status"
+                value={invoice.payment_status ? 'Paid' : 'Pending'}
+                onChange={handleChange}
+              />
+            </label>
+          </section>
+
+          {/* Product List */}
+          <section className="product-list">
+            <h3>Products</h3>
+            {invoice.items.map((item, index) => (
+              <div key={index} className="product-item">
+                <input
+                  type="text"
+                  name="product_id"
+                  value={item.product_id}
+                  onChange={(e) => handleItemChange(index, e)}
+                  placeholder="Product ID"
+                />
+                <input
+                  type="number"
+                  name="quantity"
+                  value={item.quantity}
+                  onChange={(e) => handleItemChange(index, e)}
+                  placeholder="Quantity"
+                />
+                {/* Add Price field here */}
+                <button type="button" onClick={() => removeItem(index)}>
+                  Remove Item
+                </button>
+              </div>
+            ))}
+            <button type="button" onClick={addItem}>Add Item</button>
+          </section>
 
           <button type="submit">{isEditing ? 'Update Invoice' : 'Add Invoice'}</button>
         </form>
       </div>
-    </>  
+    </>
   );
 };
 
