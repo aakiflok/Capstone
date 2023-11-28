@@ -24,6 +24,9 @@ const InvoiceView: React.FC = () => {
   if (!invoiceData) {
     return <div>Loading...</div>;
   }
+  const calculateTotal = (items: any[]): number => {
+    return items.reduce((acc, current) => acc + (current.quantity * current.final_price), 0);
+  };
 
   // Format the invoice date
   const invoiceDate = new Date(invoiceData?.date).toLocaleDateString('en-US');
@@ -61,7 +64,7 @@ const InvoiceView: React.FC = () => {
                 <tr key={item._id}>
                   <td>{item.product_id.name}</td>
                   <td>{item.quantity}</td>
-                  <td>${item.product_id.price}</td>
+                  <td>${item.final_price.toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
@@ -70,7 +73,6 @@ const InvoiceView: React.FC = () => {
 
         <div className="invoice-summary">
           <div className="invoice-totals">
-            <p><strong>Tax:</strong> ${invoiceData.tax}</p>
             <p><strong>Total:</strong> ${invoiceData.total}</p>
           </div>
         </div>

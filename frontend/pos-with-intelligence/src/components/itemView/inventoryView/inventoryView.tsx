@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../../navigation/nav';
-import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import './inventoryView.css'; // Import your CSS file here
+import { Container, Row, Col, Button, Table } from 'react-bootstrap';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 
 const InventoryView: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const { id } = useParams();
   const [user, setUser] = useState<any | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     let isMounted = true;
 
     const fetchData = async () => {
       try {
-        // Send a GET request to your API using the 'id' from the URL
         const response = await axios.get(`http://localhost:3001/stock/${id}`);
 
         if (isMounted) {
@@ -23,7 +23,6 @@ const InventoryView: React.FC = () => {
         }
       } catch (err) {
         console.log("Error fetching data:", err);
-        // Handle the error here
       }
     };
 
@@ -39,77 +38,91 @@ const InventoryView: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [id]); // Include 'id' in the dependency array
+  }, [id]);
+
+  const handleDeleteProduct = async () => {
+    try {
+      // Implement the logic to delete the product here
+      // Send a DELETE request to your API
+      await axios.delete(`http://localhost:3001/stock/${id}`);
+      navigate(-1); // Navigate back to the previous page
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (!selectedProduct) {
-    // Handle the case when data is still loading
     return (
       <>
-        <Navbar></Navbar>
+        <Navbar />
         <div>Loading...</div>
       </>
     );
   }
 
   return (
-    <> 
-      <Navbar></Navbar>
-      <div className="inventory-content">
-      
-        <div className="inventory-details">
-          <h2>Inventory Details</h2>
-          <table className="inventory-table">
-            <tbody>
-              <tr>
-                <td>Product Name</td>
-                <td>{selectedProduct.product_name}</td>
-              </tr>
-              <tr>
-                <td>Product ID</td>
-                <td>{selectedProduct.product_id}</td>
-              </tr>
-              <tr>
-                <td>Quantity</td>
-                <td>{selectedProduct.quantity}</td>
-              </tr>
-              <tr>
-                <td>Location of Storage</td>
-                <td>{selectedProduct.location}</td>
-              </tr>
-              <tr>
-                <td>Cost per unit</td>
-                <td>{selectedProduct.price}</td>
-              </tr>
-              <tr>
-                <td>Stocl Value</td>
-                <td>{selectedProduct.price * selectedProduct.quantity}</td>
-              </tr>
-              <tr>
-                <td>Discontinue?</td>
-                <td>{selectedProduct.discontinued ? "Yes" : "No"}</td>
-              </tr>
-            </tbody>
-          </table>
+    <>
+      <Navbar />
+      <Container fluid className="d-flex flex-column align-items-center">
+        <h2 className="mt-4">Inventory Details</h2>
+        <Row className="w-100 align-items-center" style={{ justifyContent: 'space-evenly' }}>
+          <Col md={8}>
+            <Table
+              striped
+              bordered
+              hover
+              style={{
+                maxWidth: '800px',
+                width: '100%',
+                margin: '0 auto',
+              }}
+            >
+              <tbody>
+                <tr>
+                  <td>Product Name</td>
+                  <td>{selectedProduct.product_name}</td>
+                </tr>
+                <tr>
+                  <td>Product ID</td>
+                  <td>{selectedProduct.product_id}</td>
+                </tr>
+                <tr>
+                  <td>Quantity</td>
+                  <td>{selectedProduct.quantity}</td>
+                </tr>
+                <tr>
+                  <td>Location of Storage</td>
+                  <td>{selectedProduct.location}</td>
+                </tr>
+                <tr>
+                  <td>Cost per unit</td>
+                  <td>{selectedProduct.price}</td>
+                </tr>
+                <tr>
+                  <td>Stock Value</td>
+                  <td>{selectedProduct.price * selectedProduct.quantity}</td>
+                </tr>
+                <tr>
+                  <td>Discontinue?</td>
+                  <td>{selectedProduct.discontinued ? "Yes" : "No"}</td>
+                </tr>
+              </tbody>
+            </Table>
+          </Col>
+        </Row>
+        <div className="mt-4 d-flex justify-content-center align-items-center w-100">
+          <Link to={`/editInventory/${id}`}>
+            <Button variant="primary">Edit Inventory</Button>
+          </Link>
+          {user && user.role === 'admin' && (
+            <Button variant="danger" onClick={handleDeleteProduct} className="ml-3">
+              Delete Product
+            </Button>
+          )}
         </div>
-      </div>
-      <div className="button-container">
-      {user && user.role === 'admin' && 
-              <Link to={`/editInventory/${selectedProduct._id}`} key={selectedProduct._id}>
-                <button className="edit-product-button">Edit Invetory</button>
-              </Link>
-            }
-        {user && user.role === 'admin' && (
-          <button onClick={handleDeleteEmployee} className="delete-button">
-            Delete Record
-          </button>
-        )}
-      </div>
+      </Container>
     </>
   );
 };
-
-function handleDeleteEmployee() {
-  // Implement the logic to delete the employee here
-}
 
 export default InventoryView;

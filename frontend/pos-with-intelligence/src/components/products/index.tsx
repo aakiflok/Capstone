@@ -3,10 +3,9 @@ import { Link } from 'react-router-dom';
 import ProductTile from '../tiles/productTiles/productTile';
 import Navbar from '../navigation/nav';
 import axios from 'axios';
-import './index.css';
 import { Product } from '../../models/product.module';
 import Cookies from 'js-cookie';
-import { text } from 'stream/consumers';
+import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 
 // Define types for your filters
 interface FilterState {
@@ -23,20 +22,21 @@ interface FilterState {
 }
 
 const Products: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [user, setUser] = useState<any | null>(null);
   const maxPrice = 10000;
-  const [filters, setFilters] = useState<FilterState>({
+  const initialFilters = {
     category: {
       TV: false,
       AirCondition: false,
       WashingMachine: false,
       MicroWave: false,
     },
-    priceRange: { min: 0, max: Infinity },
-  });
+    priceRange: { min: 0, max: maxPrice },
+  };
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [user, setUser] = useState<any | null>(null);
+  const [filters, setFilters] = useState<FilterState>(initialFilters);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -105,62 +105,68 @@ const Products: React.FC = () => {
     setSelectedProduct(null);
   };
 
+  const resetFilters = () => {
+    setFilters(initialFilters);
+  };
+
   return (
     <>
       <Navbar />
-      <div style={{textAlign:"center"}}>
-        {user && (
-          <Link to="/addProduct" className="product-tile-link">
-            <button className="add-product-button">Add Product</button>
-          </Link>
-        )}
-      </div>
-      <div className="products-container">
-    
-        <aside className="filter-sidebar">
-          <h2>FILTERS</h2>
-          <div className="filter-category">
-            {/* Repeat this pattern for each category */}
-            {Object.keys(filters.category).map((category) => (
-              <label key={category}>
-                <input
+
+      <Container fluid className="mt-4">
+        <Row>
+          <Col md={3}>
+            <h2>FILTERS</h2>
+            <div className="mb-3">
+              {Object.keys(filters.category).map((category) => (
+                <Form.Check
                   type="checkbox"
+                  id={`filter-${category}`}
+                  label={category}
                   checked={filters.category[category as keyof typeof filters.category]}
                   onChange={() => handleCategoryChange(category as keyof typeof filters.category)}
+                  key={category}
                 />
-                {category}
-              </label>
-            ))}
-          </div>
-          <div className="filter-price-range">
-            <label>
-              Max Price: ${filters.priceRange.max}
-              <input
+              ))}
+            </div>
+            <div className="mb-3">
+              <Form.Label htmlFor="priceRange">
+                Max Price: ${filters.priceRange.max}
+              </Form.Label>
+              <Form.Control
                 type="range"
+                id="priceRange"
                 min={0}
                 max={maxPrice}
                 value={filters.priceRange.max}
                 onChange={handlePriceRangeChange}
               />
-            </label>
-            <button onClick={() => handlePriceChange(0, maxPrice)}>Clear All</button>
-          </div>
-        </aside>
+              <Button variant="outline-secondary" size="sm" onClick={() => handlePriceChange(0, maxPrice)}>
+                Clear All
+              </Button>
+              {user && (
+                <Link to="/addProduct" className="d-block mt-2">
+                  <Button variant="primary" size="sm">Add Product</Button>
+                </Link>
+              )}
+            </div>
+          </Col>
 
-        <div className="product-tiles-container">
-          {filteredProducts.map((product) => (
-            <Link
-              to={`/product/${product._id}`} // Pass the productId as a URL parameter
-              key={product._id}
-            >
-              <ProductTile
-                product={product}
-                onClick={openProductView}
-              />
-            </Link>
-          ))}
-        </div>
-      </div>
+          <Col md={9}>
+            <Container fluid>
+              <Row>
+                {filteredProducts.map((product) => (
+                  <Col md={6} lg={4} className="mb-3" key={product._id}>
+                    <Link to={`/product/${product._id}`} className="d-block w-100">
+                      <ProductTile product={product} onClick={() => openProductView(product)} />
+                    </Link>
+                  </Col>
+                ))}
+              </Row>
+            </Container>
+          </Col>
+        </Row>
+      </Container>
     </>
   );
 };

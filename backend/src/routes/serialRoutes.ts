@@ -4,22 +4,38 @@ import { Product } from '../models/ProductModel';
 
 const router = express.Router();
 
-//get all serail value with a specific stock id
+// Get all serial values with a specific stock id
 router.get('/unit-serials-by-stock/:stockId', async (req: Request, res: Response) => {
-    try {
-      const stockId = req.params.stockId;
-      const unitSerialsForStock = await Unit_Serial.find({ stock_id: stockId });
-  
-      if (unitSerialsForStock.length === 0) {
-        return res.status(404).json({ message: 'No unit serial records found for this stock_id' });
-      }
-  
-      res.status(200).json(unitSerialsForStock);
-      
-    } catch (err: any) {
-      res.status(500).json({ message: err.message });
-    }
-  });
+  try {
+    const stockId = req.params.stockId;
+    const unitSerialsForStock = await Unit_Serial.find({ stock_id: stockId });
+    res.status(200).json(unitSerialsForStock);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Delete all unit serial records for a specific stock
+// Delete available unit serial records for a specific stock
+// Delete unit serial records by stock ID
+router.delete('/unit-serials-by-stock/:stockId', async (req: Request, res: Response) => {
+  try {
+    const stockId = req.params.stockId;
+
+    // Find all available unit serial records for the specified stock ID
+    const unitSerialsToDelete = await Unit_Serial.find({ stock_id: stockId, isAvailable: true });
+
+
+    // Delete all the available unit serial records
+    await Unit_Serial.deleteMany({ _id: { $in: unitSerialsToDelete.map(serial => serial._id) } });
+
+    res.json({ message: 'Unit serial records deleted' });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
 
 // Delete a unit serial record
 router.delete('/unit-serial/:id', async (req: Request, res: Response) => {
@@ -35,6 +51,7 @@ router.delete('/unit-serial/:id', async (req: Request, res: Response) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 // Add a new unit serial record
 router.post('/addUnitSerial', async (req: Request, res: Response) => {
   try {

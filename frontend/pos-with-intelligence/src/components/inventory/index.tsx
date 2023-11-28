@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Import Axios
+import axios from 'axios';
 import Navbar from '../navigation/nav';
-import './inventory.css';
 import { useNavigate } from 'react-router-dom';
+import { Container, Table, Button, Modal } from 'react-bootstrap'; // Import React-Bootstrap components
+import './inventory.css';
 
 const Inventory: React.FC = () => {
   const [stockList, setStockList] = useState([]);
@@ -34,11 +35,11 @@ const Inventory: React.FC = () => {
 
   return (
     <>
-      <Navbar></Navbar>
-      <div className="inventory-container">
-        <div className="content">
+     <Navbar />
+      <Container className="inventory-container">
+        <Container className="content">
           <h2>Inventory Content</h2>
-          <table className="stock-table">
+          <Table striped bordered hover className="stock-table">
             <thead>
               <tr>
                 <th>Product Name</th>
@@ -54,16 +55,16 @@ const Inventory: React.FC = () => {
                   <td>{stock.quantity}</td>
                   <td>{stock.location}</td>
                   <td>
-                    <button onClick={() => handleViewClick(stock)}>
+                    <Button onClick={() => handleViewClick(stock)}>
                       View
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}
             </tbody>
-          </table>
-        </div>
-      </div>
+          </Table>
+        </Container>
+      </Container>
     </>
   );
 };

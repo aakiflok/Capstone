@@ -100,11 +100,16 @@ const ProductView: React.FC = () => {
             <p className="product-price">${product.price}</p>
             <p className="product-description">{product.description}</p>
             <p className="product-quantity">Quantity: {quantity}</p>
-            
+            {user && user.role === 'admin' && 
+              <Link to={`/editProduct/${product._id}`} key={product._id}>
+                <button className="edit-product-button">Edit Product</button>
+              </Link>
+            }
             <p>{product.discontinued}</p>
           </div>
         </div>
         
+
         {/* Discussion form section */}
         <div className="discussion-section">
           <h3>Discussion Form</h3>
@@ -123,9 +128,12 @@ const ProductView: React.FC = () => {
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
             />
-            <button className="submit-message-button" onClick={handleSubmitMessage}>
-              Send
-            </button>
+            <div className='btn-grp'>
+              <button onClick={() => navigate(-1)} className="back-button">Back</button>
+              <button className="submit-message-button" onClick={handleSubmitMessage}>
+                Send
+              </button>
+            </div>
           </div>
         </div>
       </div>

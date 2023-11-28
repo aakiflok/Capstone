@@ -121,8 +121,9 @@ router.put('/updateUser/:id', async (req: Request, res: Response) => {
 // Delete a user
 router.delete('/users/:id', getUser, async (req: Request, res: Response) => {
   try {
-    await res.locals.user.remove();
-    res.json({ message: 'User deleted' });
+    const userId = req.params.id;
+    await User.findByIdAndDelete(userId);
+    res.json({ message: 'Employee deleted' });
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }

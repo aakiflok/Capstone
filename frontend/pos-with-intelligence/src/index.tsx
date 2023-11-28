@@ -7,53 +7,29 @@ import { BrowserRouter } from "react-router-dom";
 
 import { AuthProvider } from "react-auth-kit";
 
-import { Provider as StyletronProvider } from "styletron-react";
-import { Client as Styletron } from "styletron-engine-atomic";
 
-import {
-  LightTheme,
-  BaseProvider,
-  styled,
-  DarkTheme,
-  createDarkTheme,
-} from "baseui";
-
-const engine = new Styletron();
-
-const Centered = styled("div", {
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  height: "100%",
-  width: "100%",
-});
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <StyletronProvider value={engine}>
-      <BaseProvider
-        theme={DarkTheme}
-        overrides={{
-          AppContainer: { style: { width: "100%", height: "100%" } },
-        }}
-      >
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+      
         <AuthProvider
           authType={"cookie"}
           authName={"_auth"}
           cookieDomain={window.location.hostname}
           cookieSecure={false}
         >
-          <Centered>
             <BrowserRouter>
               <App />
             </BrowserRouter>
-          </Centered>
         </AuthProvider>
-      </BaseProvider>
-    </StyletronProvider>
   </React.StrictMode>
 );
 

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Import Axios
+import axios from 'axios';
 import Navbar from '../navigation/nav';
 import './employee.css';
 import { Link, useNavigate } from 'react-router-dom';
+import { Container, Table, Button } from 'react-bootstrap'; // Import React-Bootstrap components
 
 const Employees: React.FC = () => {
   const [employeeList, setEmployeeList] = useState([]);
-  const [selectedEmployee, setSelectedEmployee] = useState<any>(null); // State to hold the selected employee
+  const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,7 +16,6 @@ const Employees: React.FC = () => {
 
   const fetchEmployeeData = async () => {
     try {
-      // Make a GET request to the '/users' route
       const response = await axios.get('http://localhost:3001/users');
       setEmployeeList(response.data);
     } catch (error) {
@@ -29,44 +29,44 @@ const Employees: React.FC = () => {
   };
 
   const closeModal = () => {
-    setSelectedEmployee(null); // Close the modal
+    setSelectedEmployee(null);
   };
 
   return (
     <>
       <Navbar></Navbar>
-      
-      
-      <div className="employees-container">
-      <Link to="/addEmployee" className="product-tile-link">
-            <button className="add-employee-button">Add Employee</button>
-      </Link>
-        <div className="content">
+      <Container className="employees-container">
+        <Link to="/addEmployee" className="product-tile-link">
+          <Button className="add-employee-button">Add Employee</Button>
+        </Link>
+        <Container className="content">
           <h2>Employees List</h2>
-          <table className="employee-table">
+          <Table striped bordered hover className="employee-table">
             <thead>
               <tr>
-                <th>Employee ID</th>
+                <th>#</th>
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {employeeList.map((employee: any) => (
+              {employeeList.map((employee: any, index: number) => (
                 <tr key={employee._id}>
-                  <td>{employee._id}</td>
+                  <td>{index + 1}</td> {/* Display count instead of employee_id */}
                   <td>{employee.first_name}</td>
                   <td>{employee.last_name}</td>
                   <td>
-                    <button onClick={() => handleViewClick(employee)}>View</button>
+                    <Button onClick={() => handleViewClick(employee)}>
+                      View
+                    </Button>
                   </td>
                 </tr>
               ))}
             </tbody>
-          </table>
-        </div>
-      </div>
+          </Table>
+        </Container>
+      </Container>
     </>
   );
 };

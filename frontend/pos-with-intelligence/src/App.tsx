@@ -22,6 +22,7 @@ import AddEditCustomerForm from "./components/forms/customerForms/addEditCustome
 import Invoice from "./components/invoice/invoice";
 import InvoiceView from "./components/itemView/invoiceView/invoiceView";
 import AddEditInvoiceForm from "./components/forms/invoiceForms/addEditInvoiceForm";
+import Reports from "./components/reports/reports";
 
 
 const AppContainer = styled.div`
@@ -44,6 +45,7 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         <Route path="/home" element={<RequireAuth loginPath="/login"><Home /></RequireAuth>} />
+        <Route path="/reports" element={<RequireAuth loginPath="/login"><Reports /></RequireAuth>} />
         <Route path="/products" element={<RequireAuth loginPath="/login"><Products /></RequireAuth>}/>
         <Route path="/product/:id" element={<RequireAuth loginPath="/login"><ProductView /></RequireAuth>}/>       
         <Route path="/profile" element={<RequireAuth loginPath="/login"><Profile /></RequireAuth>}/>
@@ -54,6 +56,7 @@ function App() {
         <Route path="/invoice" element={<RequireAuth loginPath="/login"><Invoice /></RequireAuth>}/>
         <Route path="/invoice/:id" element={<RequireAuth loginPath="/login"><InvoiceView /></RequireAuth>}/>
         <Route path="/editInvoice/:id" element={<RequireAuth loginPath="/login"><AddEditInvoiceForm /></RequireAuth>}/>
+        <Route path="/addInvoice" element={<RequireAuth loginPath="/login"><AddEditInvoiceForm /></RequireAuth>}/>
         <Route path="/customers/edit/:id" element={<RequireAuth loginPath="/login"><AddEditCustomerForm /></RequireAuth>}/>
         <Route path="/employees/:id" element={<RequireAuth loginPath="/login"><EmployeeView /></RequireAuth>}/>
         <Route path="/inventory/:id" element={<RequireAuth loginPath="/login"><InventoryView /></RequireAuth>}/>
@@ -62,7 +65,6 @@ function App() {
         <Route path="/editProduct/:id" element={<RequireAuth loginPath="/login"><AddEditProductForm /></RequireAuth>}/>
         <Route path="/editEmployee/:id" element={<RequireAuth loginPath="/login"><AddEditEmployeeForm /></RequireAuth>}/>
         <Route path="/addEmployee" element={<RequireAuth loginPath="/login"><AddEditEmployeeForm /></RequireAuth>}/>
-        
       </Routes>
     </AppContainer>
   );

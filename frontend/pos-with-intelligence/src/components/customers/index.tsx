@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../navigation/nav';
-import './customers.css'
 import { useNavigate } from 'react-router-dom';
+import { Container, Table, Button } from 'react-bootstrap'; // Import React-Bootstrap components
+import './customers.css';
 
 const Customers: React.FC = () => {
   const [customerList, setCustomerList] = useState([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const navigate = useNavigate();
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -22,21 +23,16 @@ const Customers: React.FC = () => {
   };
 
   const handleViewClick = (customer: any) => {
-    setSelectedCustomer(customer);
     navigate(`/customers/${customer._id}`);
-  };
-
-  const closeModal = () => {
-    setSelectedCustomer(null);
   };
 
   return (
     <>
       <Navbar />
-      <div className="customers-container">
-        <div className="content">
+      <Container >
+        <Container className="content">
           <h2>Customer Content</h2>
-          <table className="customer-table">
+          <Table striped bordered hover className="customer-table">
             <thead>
               <tr>
                 <th>Customer ID</th>
@@ -64,16 +60,16 @@ const Customers: React.FC = () => {
                   <td>{customer.state}</td>
                   <td>{customer.zip_code}</td>
                   <td>
-                    <button onClick={() => handleViewClick(customer)}>
+                    <Button onClick={() => handleViewClick(customer)}>
                       View
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}
             </tbody>
-          </table>
-        </div>
-      </div>
+          </Table>
+        </Container>
+      </Container>
     </>
   );
 };

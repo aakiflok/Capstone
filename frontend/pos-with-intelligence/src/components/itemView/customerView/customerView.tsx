@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../../navigation/nav';
-import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Container, Row, Col, Button, Table } from 'react-bootstrap';
 
 const CustomerView: React.FC = () => {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     let isMounted = true;
@@ -19,7 +21,6 @@ const CustomerView: React.FC = () => {
         }
       } catch (err) {
         console.log("Error fetching data:", err);
-        // Handle the error here
       }
     };
 
@@ -29,6 +30,17 @@ const CustomerView: React.FC = () => {
       isMounted = false;
     };
   }, [id]);
+
+  const handleDeleteCustomer = async () => {
+    try {
+      // Implement the logic to delete the customer here
+      // Send a DELETE request to your API
+      await axios.delete(`http://localhost:3001/customers/${id}`);
+      navigate('/customers'); // Redirect to the customers page after deletion
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (!selectedCustomer) {
     return (
@@ -44,52 +56,56 @@ const CustomerView: React.FC = () => {
   return (
     <>
       <Navbar />
-      <div style={{ padding: '20px', width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <div style={{ maxWidth: '800px', width: '100%' }}>
-          <h2>Customer Details</h2>
-          <table className="customer-table">
-            <tbody>
-              <tr>
-                <td>Customer ID</td>
-                <td>{selectedCustomer._id}</td>
-              </tr>
-              <tr>
-                <td>First Name</td>
-                <td>{selectedCustomer.first_name}</td>
-              </tr>
-              <tr>
-                <td>Last Name</td>
-                <td>{selectedCustomer.last_name}</td>
-              </tr>
-              <tr>
-                <td>Address</td>
-                <td>{selectedCustomer.address}</td>
-              </tr>
-              <tr>
-                <td>Email</td>
-                <td>{selectedCustomer.email}</td>
-              </tr>
-             
-            </tbody>
-          </table>
-          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between' }}>
-            <Link to={`/customers/edit/${id}`}>
-              <button style={{ padding: '10px 20px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px' }}>
-                Edit Customer
-              </button>
-            </Link>
-            <button onClick={handleDeleteCustomer} style={{ padding: '10px 20px', background: 'red', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px' }}>
-              Delete Customer
-            </button>
-          </div>
+      <Container fluid className="d-flex flex-column align-items-center">
+        <h2 className="mt-4">Customer Details</h2>
+        <Row className="w-100 align-items-center" style={{ justifyContent: 'space-evenly' }}>
+          <Col md={8}>
+            <Table
+              striped
+              bordered
+              hover
+              style={{
+                maxWidth: '800px',
+                width: '100%',
+                margin: '0 auto',
+              }}
+            >
+              <tbody>
+                <tr>
+                  <td>Customer ID</td>
+                  <td>{selectedCustomer._id}</td>
+                </tr>
+                <tr>
+                  <td>First Name</td>
+                  <td>{selectedCustomer.first_name}</td>
+                </tr>
+                <tr>
+                  <td>Last Name</td>
+                  <td>{selectedCustomer.last_name}</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>{selectedCustomer.address}</td>
+                </tr>
+                <tr>
+                  <td>Email</td>
+                  <td>{selectedCustomer.email}</td>
+                </tr>
+              </tbody>
+            </Table>
+          </Col>
+        </Row>
+        <div className="mt-4 d-flex justify-content-center align-items-center w-100">
+          <Link to={`/customers/edit/${id}`}>
+            <Button variant="primary">Edit Customer</Button>
+          </Link>
+          <Button variant="danger" onClick={handleDeleteCustomer} className="ml-3">
+            Delete Customer
+          </Button>
         </div>
-      </div>
+      </Container>
     </>
   );
-
-  function handleDeleteCustomer() {
-    // Implement the logic to delete the customer here
-  }
 };
 
 export default CustomerView;

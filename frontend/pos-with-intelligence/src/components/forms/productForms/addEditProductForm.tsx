@@ -3,6 +3,7 @@ import Navbar from '../../navigation/nav';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import { Link, useParams } from 'react-router-dom';
+import { Container, Form, Button, Row, Col } from 'react-bootstrap'; // Import React-Bootstrap components
 import './addEditProductForm.css';
 
 const AddEditProductForm = () => {
@@ -34,6 +35,10 @@ const AddEditProductForm = () => {
     }
   }, [id, isEditing]);
 
+  const handleGoBack = () => {
+    navigate(-1); // Navigate back to the previous page
+  };
+
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setProduct({
@@ -41,16 +46,17 @@ const AddEditProductForm = () => {
       [name]: value,
     });
   };
+
   const handleRadioChange = (e: any) => {
     const { name, value } = e.target;
-    
+
     let finalValue = value;
-    
+
     // If the changed element is the discontinued radio, parse the value to boolean
     if (name === 'discontinued') {
       finalValue = value === 'true';
     }
-  
+
     setProduct({
       ...product,
       [name]: finalValue,
@@ -59,31 +65,13 @@ const AddEditProductForm = () => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    console.log('Submitting product:', product);
     if (isEditing) {
       // If it's an edit operation, send a PUT request to update the product
       axios.put(`http://localhost:3001/products/${id}`, product)
-        .then((response) => {
-          // Handle success
-          alert('The product has been updated successfully');
-          navigate('/product/' + id);
-          console.log('Product updated:', response.data);
-        })
-        .catch((error) => {
-          // Handle error
-          console.error('Error updating product:', error);
-        });
     } else {
       // If it's not an edit operation, send a POST request to create a new product
       axios.post('http://localhost:3001/products', product)
-        .then((response) => {
-          // Handle success
-          console.log('Product added:', response.data);
-        })
-        .catch((error) => {
-          // Handle error
-          console.error('Error adding product:', error);
-        });
+
     }
   };
 
@@ -91,7 +79,7 @@ const AddEditProductForm = () => {
     const files = e.target.files;
     if (files && files[0]) {
       setUploadingImage(true);
-  
+
       axios.get<{ signature: string; timestamp: number }>('http://localhost:3001/get-signature')
         .then(response => {
           const { signature, timestamp } = response.data;
@@ -99,8 +87,8 @@ const AddEditProductForm = () => {
           formData.append('file', files[0]);
           formData.append('timestamp', timestamp.toString());
           formData.append('signature', signature);
-          formData.append('api_key', '278171197627713'); // Make sure to replace with your actual API key
-  
+          formData.append('api_key', '278171197627713');
+
           // Post to Cloudinary upload URL
           axios.post('https://api.cloudinary.com/v1_1/dxrohnluu/image/upload', formData)
             .then(uploadResponse => {
@@ -123,99 +111,106 @@ const AddEditProductForm = () => {
   return (
     <>
       <Navbar />
-      <div className="product-form-container">
+      <Container className="product-form-container">
+        <button onClick={handleGoBack} className="back-button">
+          Back
+        </button>
         <h2>{isEditing ? 'Edit Product' : 'Add a Product'}</h2>
-        <form className="product-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="name">Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={product.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="price">Price</label>
-            <input
-              type="number"
-              id="price"
-              name="price"
-              value={product.price}
-              onChange={handleChange}
-              step="0.01"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="category">Category</label>
-            <input
-              type="text"
-              id="category"
-              name="category"
-              value={product.category}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="description">Description</label>
-            <textarea
-              id="description"
+        <Form onSubmit={handleSubmit}>
+          <Row>
+            <Col>
+              <Form.Group>
+                <Form.Label>Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="name"
+                  value={product.name}
+                  onChange={handleChange}
+                  required
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Label>Price</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="price"
+                  value={product.price}
+                  onChange={handleChange}
+                  step="0.01"
+                  required
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Form.Group>
+                <Form.Label>Category</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="category"
+                  value={product.category}
+                  onChange={handleChange}
+                  required
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Label>Discontinued</Form.Label>
+                <Form.Check
+                  type="radio"
+                  name="discontinued"
+                  value="true"
+                  checked={product.discontinued === true}
+                  onChange={handleRadioChange}
+                  label="Yes"
+                />
+                <Form.Check
+                  type="radio"
+                  name="discontinued"
+                  value="false"
+                  checked={product.discontinued === false}
+                  onChange={handleRadioChange}
+                  label="No"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Form.Group>
+            <Form.Label>Description</Form.Label>
+            <Form.Control
+              as="textarea"
               name="description"
               value={product.description}
               onChange={handleChange}
               required
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="image">Image</label>
-            <input
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Image</Form.Label>
+            <Form.Control
               type="file"
-              id="image"
               name="image"
               onChange={handleImageUpload}
               disabled={uploadingImage}
             />
             {uploadingImage && <p>Uploading image...</p>}
-          </div>
-          <div className="form-group">
             {product.image_uri && (
-              <>
-                <label>Image Preview</label>
+              <div>
+                <Form.Label>Image Preview</Form.Label>
+                <br />
                 <img src={product.image_uri} alt="Product" style={{ maxWidth: '200px', maxHeight: '200px' }} />
-              </>
+              </div>
             )}
-          </div>
-          <div className="form-group">
-            <label>Discontinued</label>
-              <input
-                type="radio"
-                id="discontinued-yes"
-                name="discontinued"
-                value="true"
-                checked={product.discontinued === true}
-                onChange={handleRadioChange}
-              />
-              <label htmlFor="discontinued-yes">Yes</label>
-
-              <input
-                type="radio"
-                id="discontinued-no"
-                name="discontinued"
-                value="false"
-                checked={product.discontinued === false}
-                onChange={handleRadioChange}
-              />
-              <label htmlFor="discontinued-no">No</label>
-          </div>
-          <button type="submit" className="submit-button">
+          </Form.Group>
+          <Button type="submit" className="submit-button">
             {isEditing ? 'Update Product' : 'Add Product'}
-          </button>
-        </form>
-      </div>
+          </Button>
+        </Form>
+      </Container>
     </>
   );
 };

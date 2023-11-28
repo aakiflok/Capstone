@@ -2,14 +2,26 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../navigation/nav';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
 import './addEditEmployeeForm.css'; // Ensure this path is correct
 
-const AddEditEmployeeForm = () => {
-  const { id } = useParams(); // Get the employee ID from the route params
-  const isEditing = !!id; // Determine if it's an edit operation
+interface Employee {
+  first_name: string;
+  last_name: string;
+  birthdate: string;
+  address: string;
+  username: string;
+  password: string;
+  email: string;
+  role: string;
+  joining_date: string;
+}
 
-  // State structure adjusted for employee data
-  const [employee, setEmployee] = useState({
+const AddEditEmployeeForm: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const isEditing = !!id;
+
+  const [employee, setEmployee] = useState<Employee>({
     first_name: '',
     last_name: '',
     birthdate: '',
@@ -17,9 +29,11 @@ const AddEditEmployeeForm = () => {
     username: '',
     password: '',
     email: '',
-    role: '',
+    role: 'employee',
     joining_date: '',
   });
+
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (isEditing) {
@@ -33,7 +47,7 @@ const AddEditEmployeeForm = () => {
     }
   }, [id, isEditing]);
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setEmployee({
       ...employee,
@@ -41,144 +55,233 @@ const AddEditEmployeeForm = () => {
     });
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("prininting lode:"+isEditing);
-    if (isEditing) {
-      axios.put(`http://localhost:3001/updateUser/${id}`, employee)
-        .then((response) => {
-          console.log('Employee updated:', response.data);
-        })
-        .catch((error) => {
-          console.error('Error updating employee:', error);
-        });
-    } else {
-      console.log(employee);
-      axios.post('http://localhost:3001/addUser', employee)
-        .then((response) => {
-          console.log('Employee added:', response.data);
-        })
-        .catch((error) => {
-          console.error('Error adding employee:', error);
-        });
+    if (validateForm()) {
+      if (isEditing) {
+        axios.put(`http://localhost:3001/updateUser/${id}`, employee)
+          .then((response) => {
+            console.log('Employee updated:', response.data);
+          })
+          .catch((error) => {
+            console.error('Error updating employee:', error);
+          });
+      } else {
+        axios.post('http://localhost:3001/addUser', employee)
+          .then((response) => {
+            console.log('Employee added:', response.data);
+          })
+          .catch((error) => {
+            console.error('Error adding employee:', error);
+          });
+      }
     }
   };
 
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+
+    if (!employee.first_name.trim()) {
+      errors.first_name = 'First Name is required';
+    }
+
+    if (!employee.last_name.trim()) {
+      errors.last_name = 'Last Name is required';
+    }
+
+    if (!employee.birthdate) {
+      errors.birthdate = 'Birthdate is required';
+    }
+
+    if (!employee.address.trim()) {
+      errors.address = 'Address is required';
+    }
+
+    if (!employee.username.trim()) {
+      errors.username = 'Username is required';
+    }
+
+    if (!employee.password.trim()) {
+      errors.password = 'Password is required';
+    }
+
+    if (!employee.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!isValidEmail(employee.email)) {
+      errors.email = 'Invalid email format';
+    }
+
+    setFormErrors(errors);
+
+    return Object.keys(errors).length === 0;
+  };
+
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    return emailRegex.test(email);
+  };
   return (
     <>
       <Navbar />
-      <div className="employee-form-container">
-        <h2>{isEditing ? 'Edit Employee' : 'Add an Employee'}</h2>
-        <form className="employee-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="first_name">First Name</label>
-            <input
-              type="text"
-              id="first_name"
-              name="first_name"
-              value={employee.first_name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="last_name">Last Name</label>
-            <input
-              type="text"
-              id="last_name"
-              name="last_name"
-              value={employee.last_name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="birthdate">Birthdate</label>
-            <input
-              type="date"
-              id="birthdate"
-              name="birthdate"
-              value={employee.birthdate}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="address">Address</label>
-            <input
-              type="text"
-              id="address"
-              name="address"
-              value={employee.address}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={employee.username}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={employee.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={employee.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="role">Role</label>
-            <select
-              id="role"
-              name="role"
-              value={employee.role}
-              onChange={handleChange}
-              required
-            >
-              <option value="admin">Admin</option>
-              <option value="employee">Employee</option>
-              {/* Add any other roles you have here */}
-            </select>
-          </div>
-          <div className="form-group">
-            <label htmlFor="joining_date">Joining Date</label>
-            <input
-              type="date"
-              id="joining_date"
-              name="joining_date"
-              value={employee.joining_date}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <button type="submit" className="submit-button">
+      <Container>
+        <h2 className="mt-4">{isEditing ? 'Edit Employee' : 'Add an Employee'}</h2>
+        <Form className="employee-form mt-4" onSubmit={handleSubmit}>
+          <Row>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>First Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="first_name"
+                  value={employee.first_name}
+                  onChange={handleChange}
+                  required
+                />
+                {formErrors.first_name && (
+                  <Alert variant="danger">{formErrors.first_name}</Alert>
+                )}
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>Last Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="last_name"
+                  value={employee.last_name}
+                  onChange={handleChange}
+                  required
+                />
+                {formErrors.last_name && (
+                  <Alert variant="danger">{formErrors.last_name}</Alert>
+                )}
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>Birthdate</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="birthdate"
+                  value={employee.birthdate}
+                  onChange={handleChange}
+                  required
+                />
+                {formErrors.birthdate && (
+                  <Alert variant="danger">{formErrors.birthdate}</Alert>
+                )}
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>Address</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="address"
+                  value={employee.address}
+                  onChange={handleChange}
+                  required
+                />
+                {formErrors.address && (
+                  <Alert variant="danger">{formErrors.address}</Alert>
+                )}
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>Username</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="username"
+                  value={employee.username}
+                  onChange={handleChange}
+                  required
+                />
+                {formErrors.username && (
+                  <Alert variant="danger">{formErrors.username}</Alert>
+                )}
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  name="password"
+                  value={employee.password}
+                  onChange={handleChange}
+                  required
+                />
+                {formErrors.password && (
+                  <Alert variant="danger">{formErrors.password}</Alert>
+                )}
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  name="email"
+                  value={employee.email}
+                  onChange={handleChange}
+                  required
+                />
+                {formErrors.email && (
+                  <Alert variant="danger">{formErrors.email}</Alert>
+                )}
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>Role</Form.Label>
+                <Form.Control
+                  as="select"
+                  name="role"
+                  value={employee.role}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="admin">Admin</option>
+                  <option value="employee">Employee</option>
+                  {/* Add any other roles you have here */}
+                </Form.Control>
+                {formErrors.role && (
+                  <Alert variant="danger">{formErrors.role}</Alert>
+                )}
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>Joining Date</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="joining_date"
+                  value={employee.joining_date}
+                  onChange={handleChange}
+                  required
+                />
+                {formErrors.joining_date && (
+                  <Alert variant="danger">{formErrors.joining_date}</Alert>
+                )}
+              </Form.Group>
+            </Col>
+          </Row>
+          <Button type="submit" variant="primary">
             {isEditing ? 'Update Employee' : 'Add Employee'}
-          </button>
-        </form>
-      </div>
+          </Button>
+        </Form>
+      </Container>
     </>
   );
-};
+}
 
 export default AddEditEmployeeForm;

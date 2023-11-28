@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../navigation/nav';
-import './invoice.css'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Container, Table, Button, Form } from 'react-bootstrap'; // Import React-Bootstrap components
+import './invoice.css';
 
 const Invoice: React.FC = () => {
   const [invoiceList, setInvoiceList] = useState([]);
@@ -28,46 +29,51 @@ const Invoice: React.FC = () => {
   return (
     <>
       <Navbar />
-      <div className="invoices-container">
-        <div className="content">
+      <Container className="invoices-container">
+        <div style={{ textAlign: 'center' }}>
+          <Link to="/addInvoice" className="invoice-tile-link">
+            <Button className="invoice-product-button">Add Invoice</Button>
+          </Link>
+        </div>
+        <Container className="content">
           <h2>Invoice Content</h2>
-          <table className="invoice-table">
+          <Table striped bordered hover className="invoice-table">
             <thead>
               <tr>
-                <th>Delivery Status</th>
-                <th>Customer Name</th>
-                <th>Total</th>
-                <th>Date Issued</th>
-                <th>User</th>
-                <th>Actions</th>
+                <th className="text-center">Delivery Status</th>
+                <th className="text-center">Customer Name</th>
+                <th className="text-center">Total</th>
+                <th className="text-center">Date Issued</th>
+                <th className="text-center">User</th>
+                <th className="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {invoiceList.map((invoice: any) => (
-                <tr key={invoice._id}> {/* Ensure this key is unique */}
-                  <td>
-                    <input
+                <tr key={invoice._id}>
+                  <td className="text-center">
+                    <Form.Check
                       type="checkbox"
                       checked={invoice.delivery_status}
-                      disabled={true}
                     />
                   </td>
-                  <td>{invoice.customerName}</td>
-                  <td>${invoice.total}</td>
-                  <td>{new Date(invoice.date).toLocaleDateString()}</td>
-                  <td>{invoice.employeeName}</td>
-                  <td>
-                    <button onClick={() => handleViewClick(invoice)}>
+                  <td className="text-center">{invoice.customerName}</td>
+                  <td className="text-center">${invoice.total}</td>
+                  <td className="text-center">
+                    {new Date(invoice.date).toLocaleDateString()}
+                  </td>
+                  <td className="text-center">{invoice.employeeName}</td>
+                  <td className="text-center">
+                    <Button onClick={() => handleViewClick(invoice)}>
                       View
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}
             </tbody>
-
-          </table>
-        </div>
-      </div>
+          </Table>
+        </Container>
+      </Container>
     </>
   );
 };
