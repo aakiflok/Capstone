@@ -30,6 +30,8 @@ const AddEditInventoryForm: React.FC = () => {
     quantity: 0,
     location: '',
   });
+  
+  stock.quantity = Number(stock.quantity);
 
   const [unitSerialsAvailable, setUnitSerialsAvailable] = useState<UnitSerial[]>([]);
   const [unitSerialsNotAvailable, setUnitSerialsNotAvailable] = useState<UnitSerial[]>([]);
@@ -44,11 +46,17 @@ const AddEditInventoryForm: React.FC = () => {
   const navigate = useNavigate();
   useEffect(() => {
     // Check for changes in stock-related fields whenever stock or originalQuantity change
-    const hasStockChanges =
-      stock.quantity !== originalQuantity || stock.location !== stock.location;
-
+    const hasStockChanges = stock.quantity !== originalQuantity;
+    
+    if (hasStockChanges) {
+      console.log(typeof stock.quantity, typeof originalQuantity);
+      console.log('stock', stock);
+      console.log('originalQuantity', originalQuantity);
+    }
+  
     setStockChangesMade(hasStockChanges);
   }, [stock, originalQuantity]);
+  
 
   useEffect(() => {
     // Check for changes in unitSerialsAvailable
@@ -270,15 +278,6 @@ const AddEditInventoryForm: React.FC = () => {
               />
             </div>
           ))}
-
-          <Button
-            type="button"
-            variant="success"
-            onClick={handleAddSerial}
-            disabled={stock.quantity <= originalQuantity || !serialsAvailable}
-          >
-            Add Serial
-          </Button>
           <Button
             type="submit"
             variant={isEditing ? 'info' : 'primary'}

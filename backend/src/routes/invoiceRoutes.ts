@@ -76,8 +76,10 @@ router.get('/associatedInvoices', async (req: Request, res: Response) => {
 
 // @route   POST /invoices
 router.post('/invoices', async (req: Request, res: Response) => {
+
+
   try {
-    console.log('Request body:', req.body);
+    
     const { customer_id, user_id, total, delivery_status, date, payment_status, payment_id, items } = req.body;
 
     // Check stock availability for each item
@@ -114,17 +116,17 @@ router.post('/invoices', async (req: Request, res: Response) => {
         { new: true }
       );
 
-      console.log('Stock item:', stockItem);
-
       // Find a Unit_Serial for the product and mark as not available
-      const unitSerial = await Unit_Serial.findOneAndUpdate(
-        { stock_id: stockItem?._id, isAvailable: true },
-        { isAvailable: false },
-        { new: true }
-      );
-
-      if (!unitSerial) {
-        throw new Error(`No available unit serials for product ID ${product_id}`);
+      for (let i = 0; i < quantity; i++) {
+        const unitSerial = await Unit_Serial.findOneAndUpdate(
+          { stock_id: stockItem?._id, isAvailable: true },
+          { $set: { isAvailable: false, invoice_id: savedInvoice._id } },
+          { new: true }
+        );
+      
+        if (!unitSerial) {
+          throw new Error(`No available unit serials for product ID ${product_id}`);
+        }
       }
 
       // Create and save the invoice item
@@ -181,25 +183,33 @@ router.get('/invoices/:id', async (req, res) => {
 
 // @route   PUT /invoices/:id
 router.put('/invoices/:id', async (req: Request, res: Response) => {
-  try {
-    const updateData: InvoiceUpdateRequest = req.body;
+  try{
+    const { id } = req.params;
+    const { customer_id, user_id, total, delivery_status, date, payment_status, payment_id, items } = req.body;
 
-    // Validate updateData here if necessary
-
-    const updatedInvoice = await Invoice.findByIdAndUpdate(
-      req.params.id,
-      { $set: updateData },
-      { new: true }
-    );
-
-    if (!updatedInvoice) {
-      return res.status(404).send('Invoice not found');
+    // Check if the invoice exists
+    const existingInvoice = await Invoice.findById(id);
+    if (!existingInvoice) {
+      return res.status(404).json({ message: 'Invoice not found' });
     }
 
-    res.json(updatedInvoice);
-  } catch (err) {
+    existingInvoice.user_id = user_id;
+    existingInvoice.customer_id = customer_id;
+    existingInvoice.total = total;
+    existingInvoice.delivery_status = delivery_status;
+    existingInvoice.date = date;
+    existingInvoice.payment_status = payment_status;
+    if(payment_id) {
+      existingInvoice.payment_id = payment_id;
+    }
+
+    const updatedInvoice = await existingInvoice.save();
+
+  }
+  catch(err){
     res.status(500).send('Server Error');
   }
+
 });
 
 // @route   DELETE /invoices/:id
