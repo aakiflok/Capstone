@@ -58,6 +58,7 @@ function App() {
         <Route path="/editInvoice/:id" element={<RequireAuth loginPath="/login"><AddEditInvoiceForm /></RequireAuth>}/>
         <Route path="/addInvoice" element={<RequireAuth loginPath="/login"><AddEditInvoiceForm /></RequireAuth>}/>
         <Route path="/customers/edit/:id" element={<RequireAuth loginPath="/login"><AddEditCustomerForm /></RequireAuth>}/>
+        <Route path="/addCustomer" element={<RequireAuth loginPath="/login"><AddEditCustomerForm /></RequireAuth>}/>
         <Route path="/employees/:id" element={<RequireAuth loginPath="/login"><EmployeeView /></RequireAuth>}/>
         <Route path="/inventory/:id" element={<RequireAuth loginPath="/login"><InventoryView /></RequireAuth>}/>
         <Route path="/editInventory/:id" element={<RequireAuth loginPath="/login"><AddEditInventoryForm /></RequireAuth>}/>

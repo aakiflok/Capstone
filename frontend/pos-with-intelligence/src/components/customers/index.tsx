@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../navigation/nav';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Container, Table, Button } from 'react-bootstrap'; // Import React-Bootstrap components
 import './customers.css';
 
@@ -30,7 +30,11 @@ const Customers: React.FC = () => {
     <>
       <Navbar />
       <Container >
+      <Link to="/addCustomer" className="customer-tile-link">
+          <Button className="add-customer-button">Add Customer</Button>
+        </Link>
         <Container className="content">
+        
           <h2>Customer Content</h2>
           <Table striped bordered hover className="customer-table">
             <thead>

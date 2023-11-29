@@ -4,12 +4,11 @@ import { Customers } from '../models/CustomerModel';
 import { Invoice_Item} from '../models/InvoiceItemModel'
 import { User } from '../models/UserModel'
 import mongoose from 'mongoose';
-import Joi from 'joi';
 import { Unit_Serial } from '../models/UnitSerialModel';
 import { Stock } from '../models/StockModel';
+import { isStringLiteralOrJsxExpression } from 'typescript';
 
 const router = express.Router();
-
 
 interface InvoiceUpdateRequest {
   customer_id?: mongoose.Types.ObjectId;
@@ -202,6 +201,11 @@ router.put('/invoices/:id', async (req: Request, res: Response) => {
     if(payment_id) {
       existingInvoice.payment_id = payment_id;
     }
+
+    //get unit_serail array associated with this invoice
+    const existing_unit_serials = await Unit_Serial.find({invoice_id: id});
+
+    existing_unit_serials.map
 
     const updatedInvoice = await existingInvoice.save();
 
