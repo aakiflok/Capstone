@@ -19,6 +19,7 @@ interface UnitSerial {
   stock_id: string;
   serial_number: string;
   isAvailable: boolean;
+  invoice_id?: string;
 }
 
 const AddEditInventoryForm: React.FC = () => {
@@ -46,14 +47,7 @@ const AddEditInventoryForm: React.FC = () => {
   const navigate = useNavigate();
   useEffect(() => {
     // Check for changes in stock-related fields whenever stock or originalQuantity change
-    const hasStockChanges = stock.quantity !== originalQuantity;
-    
-    if (hasStockChanges) {
-      console.log(typeof stock.quantity, typeof originalQuantity);
-      console.log('stock', stock);
-      console.log('originalQuantity', originalQuantity);
-    }
-  
+    const hasStockChanges = stock.quantity !== originalQuantity;  
     setStockChangesMade(hasStockChanges);
   }, [stock, originalQuantity]);
   
@@ -274,6 +268,11 @@ const AddEditInventoryForm: React.FC = () => {
               <Form.Control
                 type="text"
                 value={serial.serial_number}
+                readOnly // Make the input read-only for not available serials
+              />
+              <Form.Control
+                type="text"
+                value={serial.invoice_id}
                 readOnly // Make the input read-only for not available serials
               />
             </div>

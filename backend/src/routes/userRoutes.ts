@@ -5,7 +5,6 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import mailgun from 'mailgun-js';
 import 'dotenv/config';
-import sgMail from '@sendgrid/mail'
 const router = express.Router();
 
 const DOMAIN = process.env.MAILGUN_DOMAIN || '';

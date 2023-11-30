@@ -5,6 +5,7 @@ import Navbar from '../../navigation/nav';
 import './addEditInvoiceForm.css'
 import { Product } from '../../../models/product.module';
 import { ALIGNMENT } from 'baseui/layout-grid';
+import { Button, Form } from 'react-bootstrap';
 // Define types for your invoice state
 interface InvoiceItem {
   product_id: Product;
@@ -237,7 +238,7 @@ const AddEditInvoiceForm: React.FC = () => {
 
   const handleItemQuantityChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
     const newQuantity = parseInt(event.target.value, 10);
-  
+
     if (newQuantity >= 1) {
       const updatedItems = invoice.items.map((item, i) => {
         if (i === index) {
@@ -245,11 +246,11 @@ const AddEditInvoiceForm: React.FC = () => {
         }
         return item;
       });
-  
+
       setInvoice({ ...invoice, items: updatedItems });
     }
   };
-  
+
 
   const removeItem = (itemIndex: number) => {
     const filteredItems = invoice.items.filter((_, index) => index !== itemIndex);
@@ -258,13 +259,13 @@ const AddEditInvoiceForm: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     // Perform form validation
     // if (!validateForm()) {
     //   console.error('Validation failed.');
     //   return;
     // }
-  
+
     // Prepare data for submission
     const invoiceData = {
       _id: invoice?._id,
@@ -277,10 +278,10 @@ const AddEditInvoiceForm: React.FC = () => {
       items: invoice.items.map(item => ({
         product_id: item.product_id._id,
         quantity: item.quantity,
-        final_price: item.product_id.price * item.quantity 
+        final_price: item.product_id.price * item.quantity
       }))
     };
-  
+
     try {
       // Determine if it's an edit or add operation
       if (isEditing) {
@@ -291,11 +292,11 @@ const AddEditInvoiceForm: React.FC = () => {
         try {
           const response = await axios.post('http://localhost:3001/invoices', invoiceData);
           // handle success
-        } catch (error:any) {
+        } catch (error: any) {
           console.error('Error submitting invoice:', error.response || error);
         }
       }
-  
+
       // Redirect or handle UI update after successful operation
       // navigate(isEditing ? `/invoice/${id}` : '/invoices');
     } catch (error) {
@@ -303,7 +304,7 @@ const AddEditInvoiceForm: React.FC = () => {
       // Handle error in UI, e.g., showing an error message
     }
   };
-  
+
   // Function to calculate the total invoice amount
   const calculateTotal = () => {
     return invoice.items.reduce((acc, item) => acc + item.quantity * item.product_id.price, 0);
@@ -328,6 +329,10 @@ const AddEditInvoiceForm: React.FC = () => {
 
   const invoiceDate = new Date(invoice?.date).toLocaleDateString('en-US');
 
+
+  function handlePaymentClick(): void {
+    navigate(`/payment/${id}`);
+  }
 
   // // Function to validate the form
   // const validateCustomer = (customer: Customer) => {
@@ -371,25 +376,25 @@ const AddEditInvoiceForm: React.FC = () => {
   //     payment_status: '',
   //     items: '',
   //   };
-  
+
   //   // Validate customer
   //   if (!invoice.customer_id) {
   //     newErrors.customer = 'Customer is required.';
   //     isValid = false;
   //   }
-  
+
   //   // Validate user
   //   if (!invoice.user_id) {
   //     newErrors.user = 'User is required.';
   //     isValid = false;
   //   }
-  
+
   //   // Validate date
   //   if (!invoice.date) {
   //     newErrors.date = 'Date is required.';
   //     isValid = false;
   //   }
-  
+
   //   // Validate items
   //   if (invoice.items.length === 0) {
   //     newErrors.items = 'At least one item is required.';
@@ -402,9 +407,9 @@ const AddEditInvoiceForm: React.FC = () => {
   //       }
   //     });
   //   }
-  
+
   //   // You can add more validations as needed
-  
+
   //   setErrors(newErrors);
   //   return isValid;
   // };
@@ -424,7 +429,7 @@ const AddEditInvoiceForm: React.FC = () => {
               placeholder="Search Customers"
               value={customerSearchTerm}
               onChange={handleCustomerSearchChange}
-              // onBlur={() => setErrors({ ...errors, customer: validateCustomer(invoice.customer_id) })}
+            // onBlur={() => setErrors({ ...errors, customer: validateCustomer(invoice.customer_id) })}
             />
             <div className="error-message">{errors.customer}</div>
             {customerSearchTerm && (
@@ -459,7 +464,7 @@ const AddEditInvoiceForm: React.FC = () => {
               placeholder="Search Users"
               value={userSearchTerm}
               onChange={handleUserSearchChange}
-              // onBlur={() => setErrors({ ...errors, user: validateUser(invoice.user_id) })}
+            // onBlur={() => setErrors({ ...errors, user: validateUser(invoice.user_id) })}
             />
             <div className="error-message">{errors.user}</div>
             {userSearchTerm && (
@@ -568,6 +573,9 @@ const AddEditInvoiceForm: React.FC = () => {
               </tbody>
             </table>
           </section>
+          {!invoice.payment_status &&   <Button onClick={() => handlePaymentClick()}>
+                      View
+                    </Button>}
           <button type="submit">{isEditing ? 'Update Invoice' : 'Add Invoice'}</button>
         </form >
       </div >
