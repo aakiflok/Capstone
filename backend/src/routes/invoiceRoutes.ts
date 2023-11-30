@@ -1,7 +1,7 @@
 import express, { Router, Request, Response } from 'express';
 import { Invoice } from '../models/InvoiceModel'
 import { Customers } from '../models/CustomerModel';
-import { Invoice_Item} from '../models/InvoiceItemModel'
+import { Invoice_Item } from '../models/InvoiceItemModel'
 import { User } from '../models/UserModel'
 import mongoose from 'mongoose';
 import { Unit_Serial } from '../models/UnitSerialModel';
@@ -78,7 +78,7 @@ router.post('/invoices', async (req: Request, res: Response) => {
 
 
   try {
-    
+
     const { customer_id, user_id, total, delivery_status, date, payment_status, payment_id, items } = req.body;
 
     // Check stock availability for each item
@@ -122,7 +122,7 @@ router.post('/invoices', async (req: Request, res: Response) => {
           { $set: { isAvailable: false, invoice_id: savedInvoice._id } },
           { new: true }
         );
-      
+
         if (!unitSerial) {
           throw new Error(`No available unit serials for product ID ${product_id}`);
         }
@@ -135,7 +135,7 @@ router.post('/invoices', async (req: Request, res: Response) => {
         quantity,
         final_price
       });
-      
+
       return newItem.save();
     });
 
@@ -165,7 +165,7 @@ router.get('/invoices/:id', async (req, res) => {
 
     // Assuming Invoice_Item is related to Invoice via an 'invoice_id' field
     const invoiceItems = await Invoice_Item.find({ invoice_id: req.params.id })
-                                            .populate('product_id');
+      .populate('product_id');
 
     // Combining invoice data with its items
     const result = {
@@ -174,7 +174,7 @@ router.get('/invoices/:id', async (req, res) => {
     };
 
     res.status(200).json(result);
-  } catch (err:any) {
+  } catch (err: any) {
     console.error(err.message);
     res.status(500).send('Server Error');
   }
@@ -182,10 +182,10 @@ router.get('/invoices/:id', async (req, res) => {
 
 // @route   PUT /invoices/:id
 router.put('/invoices/:id', async (req: Request, res: Response) => {
-  try{
+  try {
     const { id } = req.params;
     const { customer_id, user_id, total, delivery_status, date, payment_status, payment_id, items } = req.body;
-
+    
     // Check if the invoice exists
     const existingInvoice = await Invoice.findById(id);
     if (!existingInvoice) {
@@ -198,21 +198,68 @@ router.put('/invoices/:id', async (req: Request, res: Response) => {
     existingInvoice.delivery_status = delivery_status;
     existingInvoice.date = date;
     existingInvoice.payment_status = payment_status;
-    if(payment_id) {
+    if (payment_id) {
       existingInvoice.payment_id = payment_id;
     }
 
     //get unit_serail array associated with this invoice
-    const existing_unit_serials = await Unit_Serial.find({invoice_id: id});
 
-    existing_unit_serials.map
+    const existingInvoiceItems = await Invoice_Item.find({invoice_id: id});
+    //CII - Current Invoice Items
+    //EII - exsiting Invoice Items
+    for (const CII of items) {
+        for(const EII of existingInvoiceItems){
+          if(CII.product_id === EII .product_id){
+            //red ni quanity diff
+            var diff = CII.quantity -EII.quantity;
+            if(diff > 0){
+              const stockItem = await Stock.findOne({product_id: CII.product_id});
+              if (!stockItem || stockItem.quantity < diff) {
+                return res.status(400).json({
+                  message: `Insufficient stock for product ID ${CII.product_id}`
+                });
+              }
+              else{
+                stockItem.quantity -= diff;
+                stockItem.save();
+                for (let i = 0; i < diff; i++) {
+                  const unitSerial = await Unit_Serial.findOneAndUpdate(
+                    { stock_id: stockItem?._id, isAvailable: true },
+                    { $set: { isAvailable: false, invoice_id: id } },
+                    { new: true }
+                  );
+                }
+              }
+              //invoice_items to be saved.
+              EII.quantity = CII.quanity;
+              EII.final_price = CII.final_price;
+            }
+            
+            else if(diff < 0){
+              const stockItem = await Stock.findOne({product_id: CII.product_id});
+              stockItem!.quantity = stockItem!.quantity + (diff * -1);
+              stockItem?.save();
+              for (let i = 0; i < diff; i++) {
+                const unitSerial = await Unit_Serial.findOneAndUpdate(
+                  { stock_id: stockItem?._id, isAvailable: false, invoice_id: id },
+                  { $set: { isAvailable: true, invoice_id: null } },
+                  { new: true }
+                );
+              }
+            }
+          }
+          else if(CII.product_id !== EII.product_id){
+            
+          }
+        }
+    }
 
-    const updatedInvoice = await existingInvoice.save();
+   
 
   }
-  catch(err){
-    res.status(500).send('Server Error');
-  }
+  catch (err) {
+  res.status(500).send('Server Error');
+}
 
 });
 

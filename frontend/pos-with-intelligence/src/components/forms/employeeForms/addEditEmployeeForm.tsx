@@ -74,6 +74,16 @@ const AddEditEmployeeForm: React.FC = () => {
           .catch((error) => {
             console.error('Error adding employee:', error);
           });
+
+          axios.post('http://localhost:3001/send-email', {
+              email: employee.email,
+              message: `Account details...`
+            }).then((response) => {
+              console.log('Employee added:', response.data);
+            })
+          .catch ((error) =>{
+            console.error('Error sending email:', error);
+          });
       }
     }
   };

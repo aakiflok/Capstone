@@ -3,12 +3,12 @@ import { Product } from './../models/ProductModel';
 import { Stock } from './../models/StockModel';
 import * as cloudinary from 'cloudinary';
 import { Router } from 'express';
-
+import 'dotenv/config';
 
 cloudinary.v2.config({
-  cloud_name: 'dxrohnluu',
-  api_key: '278171197627713',
-  api_secret: 'I92bDNPLwfsA5Ba2KFcw9LLRvgg',
+  cloud_name: process.env.CLOUDNAME,
+  api_key: process.env.CLOUDAPIKEY,
+  api_secret: process.env.CLOUDINARYSECRET,
   secure: true
 });
 

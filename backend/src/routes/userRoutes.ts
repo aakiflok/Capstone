@@ -3,8 +3,13 @@ import { User } from './../models/UserModel';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import cors from 'cors';
-
+import mailgun from 'mailgun-js';
+import 'dotenv/config';
+import sgMail from '@sendgrid/mail'
 const router = express.Router();
+
+const DOMAIN = process.env.MAILGUN_DOMAIN || '';
+const mg = mailgun({ apiKey: process.env.MAILGUN_API_KEY || '', domain: DOMAIN });
 
 // Create a new user
 router.post('/addUser', async (req: Request, res: Response) => {
@@ -15,23 +20,25 @@ router.post('/addUser', async (req: Request, res: Response) => {
       birthdate,
       address,
       username,
-      password, 
+      password,
       email,
       role,
       joining_date
     } = req.body;
 
-    const user = new User({first_name,
+    const user = new User({
+      first_name,
       last_name,
       birthdate,
       address,
       username,
-      password, 
+      password,
       email,
       role,
-      joining_date});
+      joining_date
+    });
     // Set the users properties that came in the request body
-    
+
     const savedUser = await user.save();
     res.status(201).json(savedUser);
   } catch (err: any) {
@@ -39,6 +46,27 @@ router.post('/addUser', async (req: Request, res: Response) => {
   }
 });
 
+
+
+router.post('/send-email', async (req: Request, res: Response) => {
+  const { email, subject, message } = req.body;
+
+  const mailData = {
+    from: 'aakiflok52.al@gmail.com', // Your verified Mailgun sender
+    to: email,
+    subject: subject,
+    text: message,
+  };
+
+  mg.messages().send(mailData, (error, body) => {
+    if (error) {
+      console.error('Error sending email:', error);
+      return res.status(500).send({ error: error.message });
+    }
+    console.log('Email sent', body);
+    res.status(200).json({ message: 'Email sent successfully' });
+  });
+});
 // Get all users
 router.get('/users', async (req: Request, res: Response) => {
   try {
@@ -58,7 +86,7 @@ router.get('/users/:id', getUser, async (req: Request, res: Response) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-   
+
     res.status(200).json(user);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
@@ -108,7 +136,7 @@ router.put('/updateUser/:id', async (req: Request, res: Response) => {
       role: user.role,
       joining_date: user.joining_date
     };
-    
+
     res.status(200).json(responseObject);
   } catch (err: any) {
     res.status(400).json({ message: err.message });
@@ -129,7 +157,7 @@ router.delete('/users/:id', getUser, async (req: Request, res: Response) => {
   }
 });
 
-router.post('/users/login',cors(), async (req: Request, res: Response) => {
+router.post('/users/login', cors(), async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
