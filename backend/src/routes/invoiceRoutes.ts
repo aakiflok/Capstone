@@ -7,7 +7,8 @@ import mongoose from 'mongoose';
 import { Unit_Serial } from '../models/UnitSerialModel';
 import { Stock } from '../models/StockModel';
 import { isJsxFragment, isStringLiteralOrJsxExpression } from 'typescript';
-
+import Stripe from 'stripe';
+import PaymentDetail from '../models/PaymentDetailModel';
 const router = express.Router();
 
 interface InvoiceUpdateRequest {
@@ -25,6 +26,52 @@ interface InvoiceUpdateRequest {
   }[];
 }
 
+const stripe = new Stripe(process.env.STRIPESCECRET!);
+
+
+router.get('/invoice-total', async (req, res) => {
+  try{
+    const { invoiceId } = req.body;
+
+    const invoice = await Invoice.findById(invoiceId);
+
+    return res.status(200).json({ total: invoice?.total });
+  }catch (error: any) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+router.post('/process-payment', async (req, res) => {
+  try {
+    const { amount, paymentMethodId, invoiceId } = req.body;
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency: 'usd',
+      payment_method: paymentMethodId,
+      confirm: true,
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'never'
+      }
+    });
+    
+
+    // Save payment details to MongoDB
+    const paymentDetail = new PaymentDetail({
+      invoiceId,
+      amount,
+      paymentMethodId,
+      status: paymentIntent.status,
+    });
+
+    await paymentDetail.save();
+    Invoice.findByIdAndUpdate(invoiceId, { payment_status: true, payment_id: paymentDetail._id });
+    res.status(200).json({ success: true, paymentIntent });
+  } catch (error: any) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
 
 // @route   GET /invoices
 router.get('/invoices', async (req: Request, res: Response) => {
