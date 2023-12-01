@@ -29,22 +29,12 @@ interface InvoiceUpdateRequest {
 const stripe = new Stripe(process.env.STRIPESCECRET!);
 
 
-router.get('/invoice-total', async (req, res) => {
-  try{
-    const { invoiceId } = req.body;
-
-    const invoice = await Invoice.findById(invoiceId);
-
-    return res.status(200).json({ total: invoice?.total });
-  }catch (error: any) {
-    res.status(400).json({ success: false, error: error.message });
-  }
-});
 
 router.post('/process-payment', async (req, res) => {
   try {
-    const { amount, paymentMethodId, invoiceId } = req.body;
-
+    const { paymentMethodId, invoiceId } = req.body;
+    const invoice = await Invoice.findById(invoiceId);
+    const amount = invoice?.total || 0;
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: 'usd',
@@ -56,7 +46,6 @@ router.post('/process-payment', async (req, res) => {
       }
     });
     
-
     // Save payment details to MongoDB
     const paymentDetail = new PaymentDetail({
       invoiceId,
@@ -66,7 +55,7 @@ router.post('/process-payment', async (req, res) => {
     });
 
     await paymentDetail.save();
-    Invoice.findByIdAndUpdate(invoiceId, { payment_status: true, payment_id: paymentDetail._id });
+    await Invoice.findByIdAndUpdate(invoiceId, { payment_status: true, payment_id: paymentDetail._id });
     res.status(200).json({ success: true, paymentIntent });
   } catch (error: any) {
     res.status(400).json({ success: false, error: error.message });
@@ -272,6 +261,8 @@ const existingInvoice = await Invoice.findById(id);
   if (payment_id) {
     existingInvoice.payment_id = payment_id;
   }
+
+  await existingInvoice.save();
 
   //get unit_serail array associated with this invoice
   //product -< stock reset

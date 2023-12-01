@@ -4,8 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../../navigation/nav';
 import './addEditInvoiceForm.css'
 import { Product } from '../../../models/product.module';
-import { ALIGNMENT } from 'baseui/layout-grid';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Form,  Table } from 'react-bootstrap';
 // Define types for your invoice state
 interface InvoiceItem {
   product_id: Product;
@@ -326,9 +325,36 @@ const AddEditInvoiceForm: React.FC = () => {
     setCustomerSearchTerm(''); // Clear the search term after selection
   };
 
+  const renderProductRow = (item: InvoiceItem, index: number) => (
+    <tr key={index}>
+      <td>{item.product_id.name}</td>
+      <td>
+        <Form.Control
+          type="number"
+          min="1"
+          value={item.quantity}
+          onChange={(e:any) => handleItemQuantityChange(index, e)}
+          disabled={invoice.delivery_status}
+        />
+      </td>
+      <td>${item.product_id.price.toFixed(2)}</td>
+      <td>${(item.quantity * item.product_id.price).toFixed(2)}</td>
+      <td>
+        <Button 
+          variant="danger" 
+          onClick={() => removeItem(index)} 
+          disabled={invoice.delivery_status}>
+          Remove
+        </Button>
+      </td>
+    </tr>
+  );
 
   const invoiceDate = new Date(invoice?.date).toLocaleDateString('en-US');
-
+  const handleChangeCheckbox = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setInvoice(prev => ({ ...prev, [name]: checked }));
+  };
 
   function handlePaymentClick(): void {
     navigate(`/payment/${id}`);
@@ -429,6 +455,7 @@ const AddEditInvoiceForm: React.FC = () => {
               placeholder="Search Customers"
               value={customerSearchTerm}
               onChange={handleCustomerSearchChange}
+              disabled={invoice.delivery_status}
             // onBlur={() => setErrors({ ...errors, customer: validateCustomer(invoice.customer_id) })}
             />
             <div className="error-message">{errors.customer}</div>
@@ -464,6 +491,7 @@ const AddEditInvoiceForm: React.FC = () => {
               placeholder="Search Users"
               value={userSearchTerm}
               onChange={handleUserSearchChange}
+              disabled={invoice.delivery_status}
             // onBlur={() => setErrors({ ...errors, user: validateUser(invoice.user_id) })}
             />
             <div className="error-message">{errors.user}</div>
@@ -493,26 +521,30 @@ const AddEditInvoiceForm: React.FC = () => {
             <h3>Invoice Details</h3>
             <label>
               Date:
-              <input type="date" name="date" value={invoice.date} onChange={handleChange} />
-            </label>
+              <input type="date" name="date" value={invoice.date} disabled={invoice.delivery_status} onChange={handleChange} />
+            </label><br/>
             <label>
               Delivery Status:
               <input
-                type="text"
+                type="checkbox"
                 name="delivery_status"
-                value={invoice.delivery_status ? 'Delivered' : 'In Progress'}
-                onChange={handleChange}
+                checked={invoice.delivery_status}
+                onChange={handleChangeCheckbox}
               />
+              {invoice.delivery_status ? ' Delivered' : ' In Progress'}
             </label>
+            <br/>
             <label>
               Payment Status:
               <input
-                type="text"
+                type="checkbox"
                 name="payment_status"
-                value={invoice.payment_status ? 'Paid' : 'Pending'}
-                onChange={handleChange}
+                checked={invoice.payment_status}
+                onChange={handleChangeCheckbox}
+                disabled={invoice.delivery_status}
               />
-            </label>
+              {invoice.payment_status ? ' Paid' : ' Pending'}
+            </label><br/>
           </section>
 
           <div className="search-container">
@@ -523,13 +555,14 @@ const AddEditInvoiceForm: React.FC = () => {
               placeholder="Search Products"
               value={searchTerm}
               onChange={handleSearchChange}
+              disabled={invoice.delivery_status}
             />
             {searchTerm && ( // This line ensures the product list only appears when searchTerm is not empty
               <div className="product-list-container">
                 {filteredProducts.map(product => (
                   <div key={product._id} className="product-item">
                     {product.name}
-                    <button type="button" className="add-button" onClick={() => handleAddItem(product._id)}>Add</button>
+                    <Button type="button"  disabled={invoice.delivery_status} className="add-button" onClick={() => handleAddItem(product._id) }>Add</Button>
                   </div>
                 ))}
               </div>
@@ -538,7 +571,7 @@ const AddEditInvoiceForm: React.FC = () => {
           {/* Product List */}
           <section className="product-list">
             <h3>Products</h3>
-            <table>
+            <Table striped bordered hover>
               <thead>
                 <tr>
                   <th>Product Name</th>
@@ -549,34 +582,14 @@ const AddEditInvoiceForm: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {invoice.items.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.product_id.name}</td>
-                    <td>
-                      <input
-                        type="number"
-                        min="1"
-                        value={item.quantity}
-                        onChange={(e) => handleItemQuantityChange(index, e)}
-                        className="quantity-input"
-                      />
-                    </td>
-                    <td>${item.product_id.price.toFixed(2)}</td>
-                    <td>${(item.quantity * item.product_id.price).toFixed(2)}</td>
-                    <td>
-                      <button type="button" onClick={() => removeItem(index)} className="remove-button">
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {invoice.items.map(renderProductRow)}
               </tbody>
-            </table>
+            </Table>
           </section>
-          {!invoice.payment_status &&   <Button onClick={() => handlePaymentClick()}>
-                      View
-                    </Button>}
-          <button type="submit">{isEditing ? 'Update Invoice' : 'Add Invoice'}</button>
+          {!invoice.payment_status && <Button onClick={() => handlePaymentClick()}>
+            Pay
+          </Button>}
+          <Button type="submit"  disabled={invoice.delivery_status}>{isEditing ? 'Update Invoice' : 'Add Invoice'}</Button>
         </form >
       </div >
     </>
