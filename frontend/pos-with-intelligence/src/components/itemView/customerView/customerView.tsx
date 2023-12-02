@@ -17,7 +17,7 @@ const CustomerView: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/customers/${id}`);
+        const response = await axios.get(`https://pos-crud.onrender.com/customers/${id}`);
 
         if (isMounted) {
           setSelectedCustomer(response.data);
@@ -36,7 +36,7 @@ const CustomerView: React.FC = () => {
 
   const handleDeleteCustomer = async () => {
     try {
-      const response = await axios.delete(`http://localhost:3001/customers/${id}`);
+      const response = await axios.delete(`https://pos-crud.onrender.com/customers/${id}`);
      
       if (response.status === 200) {
         setSuccessMessage('Customer deleted successfully');

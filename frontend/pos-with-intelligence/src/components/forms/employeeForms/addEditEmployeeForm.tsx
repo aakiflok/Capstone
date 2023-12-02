@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
 import './addEditEmployeeForm.css'; // Ensure this path is correct
+import { useNavigate } from 'react-router-dom';
 
 interface Employee {
   first_name: string;
@@ -20,7 +21,7 @@ interface Employee {
 const AddEditEmployeeForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const isEditing = !!id;
-
+  const navigate = useNavigate();
   const [employee, setEmployee] = useState<Employee>({
     first_name: '',
     last_name: '',
@@ -37,7 +38,7 @@ const AddEditEmployeeForm: React.FC = () => {
 
   useEffect(() => {
     if (isEditing) {
-      axios.get(`http://localhost:3001/users/${id}`)
+      axios.get(`https://pos-crud.onrender.com/users/${id}`)
         .then((response) => {
           setEmployee(response.data);
         })
@@ -55,19 +56,15 @@ const AddEditEmployeeForm: React.FC = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
       if (isEditing) {
-        axios.put(`http://localhost:3001/updateUser/${id}`, employee)
-          .then((response) => {
-            console.log('Employee updated:', response.data);
-          })
-          .catch((error) => {
-            console.error('Error updating employee:', error);
-          });
+        await axios.put(`https://pos-crud.onrender.com/updateUser/${id}`, employee);
+        navigate("/employees");
+         
       } else {
-        axios.post('http://localhost:3001/addUser', employee)
+        axios.post('https://pos-crud.onrender.com/addUser', employee)
           .then((response) => {
             console.log('Employee added:', response.data);
           })
@@ -75,7 +72,7 @@ const AddEditEmployeeForm: React.FC = () => {
             console.error('Error adding employee:', error);
           });
 
-          axios.post('http://localhost:3001/send-email', {
+          axios.post('https://pos-crud.onrender.com/send-email', {
               email: employee.email,
               message: `Account details...`
             }).then((response) => {

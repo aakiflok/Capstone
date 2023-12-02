@@ -20,7 +20,7 @@ interface FilterState {
 }
 
 const Products: React.FC = () => {
-  const maxPrice = 10000;
+  var maxPrice = 0;
   const initialFilters = {
     category: {
       Television: false,
@@ -56,12 +56,26 @@ const Products: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/products");
+        const response = await axios.get("https://pos-crud.onrender.com/products");
         setProducts(response.data);
+
+        // Calculate maxprice from the fetched products data
+        const max = calculateMaxPrice(response.data);
+        maxPrice = max;
+        // Update the filters state to set the max price
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          priceRange: {
+            ...prevFilters.priceRange,
+            min: 0,
+            max: maxPrice,
+          },
+        }));
       } catch (err) {
         console.log("Error: ", err);
       }
     };
+
 
     fetchProducts();
 
@@ -73,6 +87,19 @@ const Products: React.FC = () => {
       setUser(userData.user);
     }
   }, []);
+
+  function calculateMaxPrice(products: any[]) {
+    let maxPrice = 0;
+
+    products.forEach((product: { price: number; }) => {
+      if (product.price && product.price > maxPrice) {
+        maxPrice = product.price;
+      }
+    });
+
+    return maxPrice;
+  }
+
 
   useEffect(() => {
     const applyFilters = () => {
@@ -97,12 +124,7 @@ const Products: React.FC = () => {
     }));
   };
 
-  const handlePriceChange = (min: number, max: number) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      priceRange: { min, max },
-    }));
-  };
+  
 
   const handlePriceRangeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
@@ -137,26 +159,24 @@ const Products: React.FC = () => {
               ))}
             </div>
             <div className="mb-3">
-              <Form.Label htmlFor="priceRange">
-                Max Price: ${filters.priceRange.max}
-              </Form.Label>
-              <Form.Control
-                type="range"
-                id="priceRange"
-                min={0}
-                max={maxPrice}
-                value={filters.priceRange.max}
-                onChange={handlePriceRangeChange}
-              />
-              <Button variant="outline-secondary" size="sm" onClick={() => handlePriceChange(0, maxPrice)}>
-                Clear All
-              </Button>
-              {user && (
-                <Link to="/addProduct" className="d-block mt-2">
-                  <Button variant="primary" size="sm">Add Product</Button>
-                </Link>
-              )}
-            </div>
+                <Form.Label htmlFor="maxPrice">
+                  Max Price: ${filters.priceRange.max}
+                </Form.Label>
+                <input
+                  type="number"
+                  id="maxPrice"
+                  className="form-control"
+                  min={0}
+                  max={filters.priceRange.max}
+                  value={filters.priceRange.max}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handlePriceRangeChange(e)}
+                />
+                {user && (
+                  <Link to="/addProduct" className="d-block mt-2">
+                    <Button variant="primary" size="sm">Add Product</Button>
+                  </Link>
+                )}
+              </div>
           </Col>
 
           <Col md={9}>

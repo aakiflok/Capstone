@@ -2,11 +2,24 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../navigation/nav';
 import { Link, useNavigate } from 'react-router-dom';
-import { Container, Table, Button } from 'react-bootstrap'; // Import React-Bootstrap components
+import { Container, Table, Button, FormControl } from 'react-bootstrap';
 import './customers.css';
 
+interface Customer {
+  _id: string;
+  first_name: string;
+  last_name: string;
+  address: string;
+  city: string;
+  email: string;
+  phone_number: string;
+  state: string;
+  zip_code: string;
+}
+
 const Customers: React.FC = () => {
-  const [customerList, setCustomerList] = useState([]);
+  const [customerList, setCustomerList] = useState<Customer[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,29 +28,46 @@ const Customers: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/customers');
+      const response = await axios.get<Customer[]>('https://pos-crud.onrender.com/customers');
       setCustomerList(response.data);
     } catch (error) {
       console.error('Error fetching customer data:', error);
     }
   };
 
-  const handleViewClick = (customer: any) => {
+  const handleViewClick = (customer: Customer) => {
     navigate(`/customers/${customer._id}`);
   };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const filteredCustomers = customerList.filter((customer) =>
+  (customer.first_name && customer.first_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+  (customer.last_name && customer.last_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+  (customer.email && customer.email.toLowerCase().includes(searchQuery.toLowerCase()))
+);
 
   return (
     <>
       <Navbar />
-      <Container >
+      <Container>
         <Container className="d-flex justify-content-center mt-5">
           <Link to="/addCustomer" className="customer-tile-link">
             <Button className="add-customer-button">Add Customer</Button>
           </Link>
         </Container>
         <Container className="content">
-
           <h2>Customer Content</h2>
+          <div className="search-container">
+            <FormControl
+              type="text"
+              placeholder="Search customer..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </div>
           <Table striped bordered hover className="customer-table">
             <thead>
               <tr>
@@ -54,7 +84,7 @@ const Customers: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {customerList.map((customer: any, index: number) => (
+              {filteredCustomers.map((customer, index) => (
                 <tr key={customer._id}>
                   <td>{index + 1}</td>
                   <td>{customer.first_name}</td>

@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../../navigation/nav';
 import './addEditInvoiceForm.css'
 import { Product } from '../../../models/product.module';
-import { Button, Form,  Table } from 'react-bootstrap';
+import { Button, Form, Table } from 'react-bootstrap';
 // Define types for your invoice state
 interface InvoiceItem {
   product_id: Product;
@@ -57,6 +57,7 @@ const AddEditInvoiceForm: React.FC = () => {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [allCustomers, setAllCustomers] = useState<Customer[]>([]);
   const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [orginalDeliveryStatus, setOrginalDeliveryStatus] = useState<boolean>(false);
   const [errors, setErrors] = useState({
     customer: '',
     user: '',
@@ -96,7 +97,7 @@ const AddEditInvoiceForm: React.FC = () => {
   });
 
   useEffect(() => {
-    axios.get('http://localhost:3001/products')
+    axios.get('https://pos-crud.onrender.com/products')
       .then(response => {
         setProducts(response.data);
       })
@@ -106,13 +107,14 @@ const AddEditInvoiceForm: React.FC = () => {
 
 
     if (isEditing && id) {
-      axios.get(`http://localhost:3001/invoices/${id}`)
+      axios.get(`https://pos-crud.onrender.com/invoices/${id}`)
         .then(response => {
           const fetchedInvoice: Invoice = response.data;
           setInvoice({
             ...fetchedInvoice,
             date: new Date(fetchedInvoice.date).toISOString().split('T')[0],
           });
+          setOrginalDeliveryStatus(fetchedInvoice.delivery_status);
         })
         .catch(error => console.error('Error fetching invoice:', error));
     }
@@ -127,7 +129,7 @@ const AddEditInvoiceForm: React.FC = () => {
   }, [searchTerm, products]);
 
   useEffect(() => {
-    axios.get('http://localhost:3001/customers')
+    axios.get('https://pos-crud.onrender.com/customers')
       .then(response => {
         setAllCustomers(response.data); // Store all customers in state
         setFilteredCustomers(response.data); // Also set all customers as initially filtered
@@ -138,7 +140,7 @@ const AddEditInvoiceForm: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:3001/users')
+    axios.get('https://pos-crud.onrender.com/users')
       .then(response => {
         setAllUsers(response.data); // Store all users in state
         setFilteredUsers(response.data); // Also set all users as initially filtered
@@ -285,11 +287,14 @@ const AddEditInvoiceForm: React.FC = () => {
       // Determine if it's an edit or add operation
       if (isEditing) {
         // Update existing invoice
-        await axios.put(`http://localhost:3001/invoices/${id}`, invoiceData);
+        await axios.put(`https://pos-crud.onrender.com/invoices/${id}`, invoiceData);
+
+        navigate(`/invoice/${id}`);
       } else {
         // Create new invoice
         try {
-          const response = await axios.post('http://localhost:3001/invoices', invoiceData);
+          const response = await axios.post('https://pos-crud.onrender.com/invoices', invoiceData);
+          navigate(`/invoice/${id}`);
           // handle success
         } catch (error: any) {
           console.error('Error submitting invoice:', error.response || error);
@@ -333,17 +338,17 @@ const AddEditInvoiceForm: React.FC = () => {
           type="number"
           min="1"
           value={item.quantity}
-          onChange={(e:any) => handleItemQuantityChange(index, e)}
-          disabled={invoice.delivery_status}
+          onChange={(e: any) => handleItemQuantityChange(index, e)}
+          disabled={orginalDeliveryStatus}
         />
       </td>
       <td>${item.product_id.price.toFixed(2)}</td>
       <td>${(item.quantity * item.product_id.price).toFixed(2)}</td>
       <td>
-        <Button 
-          variant="danger" 
-          onClick={() => removeItem(index)} 
-          disabled={invoice.delivery_status}>
+        <Button
+          variant="danger"
+          onClick={() => removeItem(index)}
+          disabled={orginalDeliveryStatus}>
           Remove
         </Button>
       </td>
@@ -360,87 +365,6 @@ const AddEditInvoiceForm: React.FC = () => {
     navigate(`/payment/${id}`);
   }
 
-  // // Function to validate the form
-  // const validateCustomer = (customer: Customer) => {
-  //   if (!customer.first_name || !customer.last_name) {
-  //     return 'Customer name is required.';
-  //   }
-  //   if (!customer.email) {
-  //     return 'Customer email is required.';
-  //   }
-  //   // Add more validations as needed
-  //   return '';
-  // };
-
-  // const validateUser = (user: User) => {
-  //   if (!user.first_name || !user.last_name) {
-  //     return 'User name is required.';
-  //   }
-  //   // Add more validations as needed
-  //   return '';
-  // };
-
-  // const validateItems = (items: InvoiceItem[]) => {
-  //   if (items.length === 0) {
-  //     return 'At least one item is required.';
-  //   }
-  //   for (const item of items) {
-  //     if (!item.product_id || item.quantity <= 0) {
-  //       return 'Each item must have a product and quantity greater than 0.';
-  //     }
-  //   }
-  //   return '';
-  // };
-
-  // const validateForm = () => {
-  //   let isValid = true;
-  //   let newErrors = {
-  //     customer: '',
-  //     user: '',
-  //     date: '',
-  //     delivery_status: '',
-  //     payment_status: '',
-  //     items: '',
-  //   };
-
-  //   // Validate customer
-  //   if (!invoice.customer_id) {
-  //     newErrors.customer = 'Customer is required.';
-  //     isValid = false;
-  //   }
-
-  //   // Validate user
-  //   if (!invoice.user_id) {
-  //     newErrors.user = 'User is required.';
-  //     isValid = false;
-  //   }
-
-  //   // Validate date
-  //   if (!invoice.date) {
-  //     newErrors.date = 'Date is required.';
-  //     isValid = false;
-  //   }
-
-  //   // Validate items
-  //   if (invoice.items.length === 0) {
-  //     newErrors.items = 'At least one item is required.';
-  //     isValid = false;
-  //   } else {
-  //     invoice.items.forEach(item => {
-  //       if (!item.product_id._id || item.quantity <= 0) {
-  //         newErrors.items = 'Each item must have a valid product and quantity.';
-  //         isValid = false;
-  //       }
-  //     });
-  //   }
-
-  //   // You can add more validations as needed
-
-  //   setErrors(newErrors);
-  //   return isValid;
-  // };
-
-
   return (
     <>
       <Navbar />
@@ -455,7 +379,7 @@ const AddEditInvoiceForm: React.FC = () => {
               placeholder="Search Customers"
               value={customerSearchTerm}
               onChange={handleCustomerSearchChange}
-              disabled={invoice.delivery_status}
+              disabled={orginalDeliveryStatus}
             // onBlur={() => setErrors({ ...errors, customer: validateCustomer(invoice.customer_id) })}
             />
             <div className="error-message">{errors.customer}</div>
@@ -491,8 +415,8 @@ const AddEditInvoiceForm: React.FC = () => {
               placeholder="Search Users"
               value={userSearchTerm}
               onChange={handleUserSearchChange}
-              disabled={invoice.delivery_status}
-            // onBlur={() => setErrors({ ...errors, user: validateUser(invoice.user_id) })}
+              disabled={orginalDeliveryStatus}
+          
             />
             <div className="error-message">{errors.user}</div>
             {userSearchTerm && (
@@ -521,8 +445,8 @@ const AddEditInvoiceForm: React.FC = () => {
             <h3>Invoice Details</h3>
             <label>
               Date:
-              <input type="date" name="date" value={invoice.date} disabled={invoice.delivery_status} onChange={handleChange} />
-            </label><br/>
+              <input type="date" name="date" value={invoice.date} disabled={orginalDeliveryStatus} onChange={handleChange} />
+            </label><br />
             <label>
               Delivery Status:
               <input
@@ -533,7 +457,7 @@ const AddEditInvoiceForm: React.FC = () => {
               />
               {invoice.delivery_status ? ' Delivered' : ' In Progress'}
             </label>
-            <br/>
+            <br />
             <label>
               Payment Status:
               <input
@@ -541,10 +465,10 @@ const AddEditInvoiceForm: React.FC = () => {
                 name="payment_status"
                 checked={invoice.payment_status}
                 onChange={handleChangeCheckbox}
-                disabled={invoice.delivery_status}
+                disabled={orginalDeliveryStatus}
               />
               {invoice.payment_status ? ' Paid' : ' Pending'}
-            </label><br/>
+            </label><br />
           </section>
 
           <div className="search-container">
@@ -555,14 +479,14 @@ const AddEditInvoiceForm: React.FC = () => {
               placeholder="Search Products"
               value={searchTerm}
               onChange={handleSearchChange}
-              disabled={invoice.delivery_status}
+              disabled={orginalDeliveryStatus}
             />
             {searchTerm && ( // This line ensures the product list only appears when searchTerm is not empty
               <div className="product-list-container">
                 {filteredProducts.map(product => (
                   <div key={product._id} className="product-item">
                     {product.name}
-                    <Button type="button"  disabled={invoice.delivery_status} className="add-button" onClick={() => handleAddItem(product._id) }>Add</Button>
+                    <Button type="button" disabled={orginalDeliveryStatus} className="add-button" onClick={() => handleAddItem(product._id)}>Add</Button>
                   </div>
                 ))}
               </div>
@@ -589,7 +513,7 @@ const AddEditInvoiceForm: React.FC = () => {
           {!invoice.payment_status && <Button onClick={() => handlePaymentClick()}>
             Pay
           </Button>}
-          <Button type="submit"  disabled={invoice.delivery_status}>{isEditing ? 'Update Invoice' : 'Add Invoice'}</Button>
+          <Button type="submit" disabled={orginalDeliveryStatus}>{isEditing ? 'Update Invoice' : 'Add Invoice'}</Button>
         </form >
       </div >
     </>

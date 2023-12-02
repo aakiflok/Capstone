@@ -17,7 +17,7 @@ const EmployeeView: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/users/${id}`);
+        const response = await axios.get(`https://pos-crud.onrender.com/users/${id}`);
 
         if (isMounted) {
           setSelectedEmployee(response.data);
@@ -56,7 +56,7 @@ const EmployeeView: React.FC = () => {
 
   const handleDeleteEmployee = async () => {
     try {
-      const response = await axios.delete(`http://localhost:3001/users/${id}`);
+      const response = await axios.delete(`https://pos-crud.onrender.com/users/${id}`);
       if (response.status === 200) {
         setSuccessMessage('Employee deleted successfully');
         navigate('/employees');

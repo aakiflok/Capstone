@@ -16,7 +16,7 @@ const InventoryView: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/stock/${id}`);
+        const response = await axios.get(`https://pos-crud.onrender.com/stock/${id}`);
 
         if (isMounted) {
           setSelectedProduct(response.data);
@@ -44,7 +44,7 @@ const InventoryView: React.FC = () => {
     try {
       // Implement the logic to delete the product here
       // Send a DELETE request to your API
-      await axios.delete(`http://localhost:3001/stock/${id}`);
+      await axios.delete(`https://pos-crud.onrender.com/stock/${id}`);
       navigate(-1); // Navigate back to the previous page
     } catch (error) {
       console.error(error);
