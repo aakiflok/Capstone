@@ -64,23 +64,14 @@ const AddEditEmployeeForm: React.FC = () => {
         navigate("/employees");
          
       } else {
-        axios.post('https://pos-crud.onrender.com/addUser', employee)
-          .then((response) => {
-            console.log('Employee added:', response.data);
-          })
-          .catch((error) => {
-            console.error('Error adding employee:', error);
-          });
-
-          axios.post('https://pos-crud.onrender.com/send-email', {
+        await axios.post('https://pos-crud.onrender.com/addUser', employee)
+          
+        navigate("/employees");
+        await axios.post('https://pos-crud.onrender.com/send-email', {
               email: employee.email,
               message: `Account details...`
-            }).then((response) => {
-              console.log('Employee added:', response.data);
             })
-          .catch ((error) =>{
-            console.error('Error sending email:', error);
-          });
+            navigate("/employees");
       }
     }
   };
