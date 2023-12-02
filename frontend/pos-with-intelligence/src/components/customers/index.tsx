@@ -30,11 +30,13 @@ const Customers: React.FC = () => {
     <>
       <Navbar />
       <Container >
-      <Link to="/addCustomer" className="customer-tile-link">
-          <Button className="add-customer-button">Add Customer</Button>
-        </Link>
+        <Container className="d-flex justify-content-center mt-5">
+          <Link to="/addCustomer" className="customer-tile-link">
+            <Button className="add-customer-button">Add Customer</Button>
+          </Link>
+        </Container>
         <Container className="content">
-        
+
           <h2>Customer Content</h2>
           <Table striped bordered hover className="customer-table">
             <thead>

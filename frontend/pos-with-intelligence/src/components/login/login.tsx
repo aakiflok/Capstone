@@ -1,27 +1,11 @@
-import { Button } from "baseui/button";
-import { Input } from "baseui/input";
-import styled from "styled-components";
-import {
-  HeadingXXLarge,
-  HeadingXLarge,
-  HeadingLarge,
-  HeadingMedium,
-  HeadingSmall,
-  HeadingXSmall,
-} from "baseui/typography";
-import {
-  Container,
-  ErrorText,
-  InnerContainer,
-  InputWrapper,
-  StyledInput,
-} from "../commons";
+import React, { useState } from 'react';
+import { Button, Card, Container, Form } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { useFormik } from 'formik';
+import axios, { AxiosError } from 'axios';
 
-import { useSignIn } from "react-auth-kit";
-import { useFormik } from "formik";
-import axios, { AxiosError } from "axios";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+
+import { useSignIn } from "react-auth-kit";;
 
 function Login(props: any) {
   const [error, setError] = useState("");
@@ -50,7 +34,6 @@ function Login(props: any) {
         setError(err.response?.data.message);
       else if (err && err instanceof Error) setError(err.message);
 
-      console.log("Error: ", err);
     }
   };
 
@@ -63,40 +46,44 @@ function Login(props: any) {
   });
 
   return (
-    <Container>
-      <InnerContainer>
-        <form onSubmit={formik.handleSubmit}>
-          <HeadingXXLarge>Welcome Back!</HeadingXXLarge>
-          <ErrorText>{error}</ErrorText>
-          <InputWrapper>
-            <StyledInput
-              name="username"
-              value={formik.values.username}
-              onChange={formik.handleChange}
-              placeholder="username"
-              clearOnEscape
-              size="large"
-              type="username"
-            />
-          </InputWrapper>
-          <InputWrapper>
-            <StyledInput
-              name="password"
-              value={formik.values.password}
-              onChange={formik.handleChange}
-              placeholder="Password"
-              clearOnEscape
-              size="large"
-              type="password"
-            />
-          </InputWrapper>
-          <InputWrapper>
-            <Button size="large" kind="primary" isLoading={formik.isSubmitting}>
-              Login
+    <Container className="mt-5 d-flex justify-content-center align-items-center min-vh-100">
+      <Card style={{ width: '18rem' }}>
+        <Card.Body>
+          {error && <p className="text-danger">{error}</p>}
+          <Form onSubmit={formik.handleSubmit}>
+            <Form.Group controlId="username">
+              <Form.Label>Username</Form.Label>
+              <Form.Control
+                type="text"
+                name="username"
+                placeholder="Username"
+                value={formik.values.username}
+                onChange={formik.handleChange}
+                style={{ borderColor: 'blue', color: 'blue' }} // Example: Blue color
+              />
+            </Form.Group>
+            <Form.Group controlId="password">
+              <Form.Label>Password</Form.Label>
+              <Form.Control
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                style={{ borderColor: 'green', color: 'green' }} // Example: Green color
+              />
+            </Form.Group>
+            <Button
+              variant="primary"
+              type="submit"
+              disabled={formik.isSubmitting}
+              style={{ backgroundColor: 'blue', borderColor: 'blue' }} // Example: Blue color
+            >
+              {formik.isSubmitting ? 'Logging in...' : 'Login'}
             </Button>
-          </InputWrapper>
-        </form>
-      </InnerContainer>
+          </Form>
+        </Card.Body>
+      </Card>
     </Container>
   );
 }

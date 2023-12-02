@@ -14,19 +14,8 @@ export const categoryOptions = [
   'Air Conditioner',
   'Microwave Oven',
   'Vacuum Cleaner',
-  'Coffee Maker',
-  'Blender',
-  'Toaster',
   'Oven',
   'Cooktop',
-  'Range Hood',
-  'Food Processor',
-  'Hair Dryer',
-  'Iron',
-  'Juicer',
-  'Water Heater',
-  'Smart Home',
-  'Fitness Equipment',
 ];
 
 const AddEditProductForm = () => {

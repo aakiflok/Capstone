@@ -29,10 +29,10 @@ const Navbar = () => {
 
   return (
     <BootstrapNavbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
-    <BootstrapNavbar.Brand as={Link} to="/home">Brand</BootstrapNavbar.Brand>
+    <BootstrapNavbar.Brand as={Link} to="/home">Pos with Intelligence</BootstrapNavbar.Brand>
     <BootstrapNavbar.Toggle aria-controls="responsive-navbar-nav" />
     <BootstrapNavbar.Collapse id="responsive-navbar-nav">
-      <Nav className="mr-auto">
+      <Nav className="mr-auto ml-auto">
         <Nav.Link as={Link} to="/home">Home</Nav.Link>
         <Nav.Link as={Link} to="/products">Products</Nav.Link>
           <Nav.Link as={Link} to="/invoice">Invoice</Nav.Link>
