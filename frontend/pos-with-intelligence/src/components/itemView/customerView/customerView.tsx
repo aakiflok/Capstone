@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../../navigation/nav';
 import axios from 'axios';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Button, Table } from 'react-bootstrap';
+import { Container, Row, Col, Button, Table, Alert } from 'react-bootstrap';
 
 const CustomerView: React.FC = () => {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -33,12 +36,16 @@ const CustomerView: React.FC = () => {
 
   const handleDeleteCustomer = async () => {
     try {
-      // Implement the logic to delete the customer here
-      // Send a DELETE request to your API
-      await axios.delete(`http://localhost:3001/customers/${id}`);
-      navigate('/customers'); // Redirect to the customers page after deletion
+      const response = await axios.delete(`http://localhost:3001/customers/${id}`);
+     
+      if (response.status === 200) {
+        setSuccessMessage('Customer deleted successfully');
+        navigate('/customers');
+      } else {
+        setErrorMessage(response.data.message);
+      } 
     } catch (error) {
-      console.error(error);
+      setErrorMessage('Error deleting customer');
     }
   };
 
@@ -103,6 +110,18 @@ const CustomerView: React.FC = () => {
             Delete Customer
           </Button>
         </div>
+
+        {successMessage && (
+          <Alert variant="success" className="mt-3">
+            {successMessage}
+          </Alert>
+        )}
+
+        {errorMessage && (
+          <Alert variant="danger" className="mt-3">
+            {errorMessage}
+          </Alert>
+        )}
       </Container>
     </>
   );

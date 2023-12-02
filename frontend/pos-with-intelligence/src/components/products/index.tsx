@@ -6,14 +6,12 @@ import axios from 'axios';
 import { Product } from '../../models/product.module';
 import Cookies from 'js-cookie';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { categoryOptions } from '../forms/productForms/addEditProductForm';
 
 // Define types for your filters
 interface FilterState {
   category: {
-    TV: boolean;
-    AirCondition: boolean;
-    WashingMachine: boolean;
-    MicroWave: boolean;
+    [category: string]: boolean;
   };
   priceRange: {
     min: number;
@@ -25,10 +23,27 @@ const Products: React.FC = () => {
   const maxPrice = 10000;
   const initialFilters = {
     category: {
-      TV: false,
-      AirCondition: false,
-      WashingMachine: false,
-      MicroWave: false,
+      Television: false,
+      Refrigerator: false,
+      'Sound Bar': false,
+      Dishwasher: false,
+      'Washing Machine': false,
+      'Air Conditioner': false,
+      'Microwave Oven': false,
+      'Vacuum Cleaner': false,
+      'Coffee Maker': false,
+      Blender: false,
+      Toaster: false,
+      Oven: false,
+      Cooktop: false,
+      'Range Hood': false,
+      'Food Processor': false,
+      'Hair Dryer': false,
+      Iron: false,
+      Juicer: false,
+      'Water Heater': false,
+      'Smart Home': false,
+      'Fitness Equipment': false,
     },
     priceRange: { min: 0, max: maxPrice },
   };
@@ -101,14 +116,6 @@ const Products: React.FC = () => {
     setSelectedProduct(product);
   };
 
-  const closeProductView = () => {
-    setSelectedProduct(null);
-  };
-
-  const resetFilters = () => {
-    setFilters(initialFilters);
-  };
-
   return (
     <>
       <Navbar />
@@ -118,7 +125,7 @@ const Products: React.FC = () => {
           <Col md={3}>
             <h2>FILTERS</h2>
             <div className="mb-3">
-              {Object.keys(filters.category).map((category) => (
+              {categoryOptions.map((category) => (
                 <Form.Check
                   type="checkbox"
                   id={`filter-${category}`}

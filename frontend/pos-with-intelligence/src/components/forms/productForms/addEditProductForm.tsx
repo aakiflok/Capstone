@@ -5,6 +5,29 @@ import { useNavigate } from "react-router-dom";
 import { Link, useParams } from 'react-router-dom';
 import { Container, Form, Button, Row, Col } from 'react-bootstrap'; // Import React-Bootstrap components
 import './addEditProductForm.css';
+export const categoryOptions = [
+  'Television',
+  'Refrigerator',
+  'Sound Bar',
+  'DishWasher',
+  'Washing Machine',
+  'Air Conditioner',
+  'Microwave Oven',
+  'Vacuum Cleaner',
+  'Coffee Maker',
+  'Blender',
+  'Toaster',
+  'Oven',
+  'Cooktop',
+  'Range Hood',
+  'Food Processor',
+  'Hair Dryer',
+  'Iron',
+  'Juicer',
+  'Water Heater',
+  'Smart Home',
+  'Fitness Equipment',
+];
 
 const AddEditProductForm = () => {
   const { id } = useParams(); // Get the product ID from the route params
@@ -20,6 +43,8 @@ const AddEditProductForm = () => {
     image_uri: '',
     discontinued: false,
   });
+
+
 
   useEffect(() => {
     // If it's an edit operation (ID is available in params), fetch the product data
@@ -145,18 +170,24 @@ const AddEditProductForm = () => {
             </Col>
           </Row>
           <Row>
-            <Col>
-              <Form.Group>
-                <Form.Label>Category</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="category"
-                  value={product.category}
-                  onChange={handleChange}
-                  required
-                />
-              </Form.Group>
-            </Col>
+          <Col>
+            <Form.Group>
+              <Form.Label>Category</Form.Label>
+              <Form.Select
+                name="category"
+                value={product.category}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select a Category</option>
+                {categoryOptions.map((category, index) => (
+                  <option key={index} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </Col>
             <Col>
               <Form.Group>
                 <Form.Label>Discontinued</Form.Label>

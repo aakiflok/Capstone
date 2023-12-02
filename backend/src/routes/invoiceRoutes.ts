@@ -337,61 +337,6 @@ const existingInvoice = await Invoice.findById(id);
 
   await Promise.all(itemsPromises);
 
-  // ciii apply
-  //CII - Current Invoice Items
-  //EII - exsiting Invoice Items
-  // for (const CII of items) {
-
-
-  //   let EII = await Invoice_Item.find({ invoice_id: id, product_id: CII.product_id });
-
-  //   if (EII) {
-  //     //red ni quanity diff
-  //     var diff = CII.quantity - EII.quantity;
-  //     if (diff > 0) {
-  //       const stockItem = await Stock.findOne({ product_id: CII.product_id });
-  //       if (!stockItem || stockItem.quantity < diff) {
-  //         return res.status(400).json({
-  //           message: `Insufficient stock for product ID ${CII.product_id}`
-  //         });
-  //       }
-  //       else {
-  //         stockItem.quantity -= diff;
-  //         stockItem.save();
-  //         for (let i = 0; i < diff; i++) {
-  //           const unitSerial = await Unit_Serial.findOneAndUpdate(
-  //             { stock_id: stockItem?._id, isAvailable: true },
-  //             { $set: { isAvailable: false, invoice_id: id } },
-  //             { new: true }
-  //           );
-  //         }
-  //       }
-  //       //invoice_items to be saved.
-  //       EII.quantity = CII.quanity;
-  //       EII.final_price = CII.final_price;
-  //     }
-
-  //     else if (diff < 0) {
-  //       const stockItem = await Stock.findOne({ product_id: CII.product_id });
-  //       stockItem!.quantity = stockItem!.quantity + (diff * -1);
-  //       stockItem?.save();
-  //       for (let i = 0; i < diff; i++) {
-  //         const unitSerial = await Unit_Serial.findOneAndUpdate(
-  //           { stock_id: stockItem?._id, isAvailable: false, invoice_id: id },
-  //           { $set: { isAvailable: true, invoice_id: null } },
-  //           { new: true }
-  //         );
-  //       }
-  //     }
-  //   }
-  //   //current has new product 
-  //   else {
-
-
-  //   }
-  //   //existing ref and dishwasher
-  //   //current ref
-  // }
 
   const updatedInvoice = await Invoice_Item.find({ invoice_id: id });
 
@@ -417,18 +362,37 @@ router.delete('/invoices/:id', async (req: Request, res: Response) => {
 // Express route to get monthly sales data for the line graph
 router.get('/monthly-sales', async (req: Request, res: Response) => {
   try {
+    const { startDate, endDate } = req.query;
+
+    const match: any = {
+     
+    };
+
+    if (startDate && endDate) {
+      // If both startDate and endDate are provided, add date filtering
+      match.date = {
+        $gte: new Date(startDate.toString()),
+        $lte: new Date(endDate.toString()),
+      };
+    }
+
     const monthlySales = await Invoice.aggregate([
+      {
+        $match: match,
+      },
       {
         $project: {
           month: { $month: "$date" },
           year: { $year: "$date" },
+          date: 1, // Include the date field
           total: 1
         }
       },
       {
         $group: {
           _id: { year: "$year", month: "$month" },
-          totalSales: { $sum: "$total" }
+          totalSales: { $sum: "$total" },
+          dates: { $push: "$date" } // Collect all the dates for each group
         }
       },
       {
@@ -439,13 +403,54 @@ router.get('/monthly-sales', async (req: Request, res: Response) => {
           _id: 0,
           year: "$_id.year",
           month: "$_id.month",
-          totalSales: 1
+          totalSales: 1,
+          dates: 1 // Include the dates array in the projection
         }
       }
     ]);
 
     res.status(200).json(monthlySales);
   } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+router.get('/monthly-sales-by-category', async (req: Request, res: Response) => {
+  try {
+    const monthlySalesByCategory = await Invoice_Item.aggregate([
+      {
+        $lookup: {
+          from: 'products', // Assuming your Product model is named 'products'
+          localField: 'product_id',
+          foreignField: '_id',
+          as: 'product'
+        }
+      },
+      {
+        $unwind: '$product' // Unwind the 'product' array
+      },
+      {
+        $group: {
+          _id: '$product.category', // Group by category from Product
+          totalSales: { $sum: '$final_price' } // Calculate total sales
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          category: '$_id', // Include category in the result
+          totalSales: 1
+        }
+      }
+    ]);
+
+    // Log the result for debugging
+    console.log('Monthly Sales:', monthlySalesByCategory);
+
+    res.status(200).json(monthlySalesByCategory);
+  } catch (err: any) {
+    console.error('Error fetching monthly sales by category:', err);
     res.status(500).json({ message: err.message });
   }
 });

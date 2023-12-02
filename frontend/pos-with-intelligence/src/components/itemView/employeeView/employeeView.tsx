@@ -8,6 +8,8 @@ import { Container, Row, Col, Button, Table, Alert } from 'react-bootstrap';
 const EmployeeView: React.FC = () => {
   const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
   const { id } = useParams();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,29 +56,13 @@ const EmployeeView: React.FC = () => {
 
   const handleDeleteEmployee = async () => {
     try {
-      // Check if the employee is associated with any invoices
-      const invoiceResponse = await axios.get(
-        `http://localhost:3001/associatedInvoices?employeeId=${id}`
-      );
-      const associatedInvoices = invoiceResponse.data;
-
-      if (associatedInvoices.length > 0) {
-        // If there are associated invoices, show a pop-up message or alert to the user
-        // You can use a modal or any other user-friendly way to display the message
-        // Here, we'll use a simple window.confirm
-        const confirmDelete = window.confirm(
-          'This employee is associated with one or more invoices. Deleting them will also delete those invoices. Are you sure you want to continue?'
-        );
-
-        if (!confirmDelete) {
-          // User canceled the deletion, so return without deleting the employee
-          return;
-        }
+      const response = await axios.delete(`http://localhost:3001/users/${id}`);
+      if (response.status === 200) {
+        setSuccessMessage('Employee deleted successfully');
+        navigate('/employees');
+      } else {
+        setErrorMessage(response.data.message);
       }
-
-      // If there are no associated invoices or the user confirmed the deletion, proceed with deleting the employee
-      await axios.delete(`http://localhost:3001/users/${id}`);
-      navigate('/employees');
     } catch (error) {
       console.error(error);
     }
@@ -151,6 +137,18 @@ const EmployeeView: React.FC = () => {
             Delete Employee
           </Button>
         </div>
+        
+        {successMessage && (
+          <Alert variant="success" className="mt-3">
+            {successMessage}
+          </Alert>
+        )}
+
+        {errorMessage && (
+          <Alert variant="danger" className="mt-3">
+            {errorMessage}
+          </Alert>
+        )}
       </Container>
     </>
   );

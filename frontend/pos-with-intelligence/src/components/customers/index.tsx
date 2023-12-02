@@ -39,7 +39,7 @@ const Customers: React.FC = () => {
           <Table striped bordered hover className="customer-table">
             <thead>
               <tr>
-                <th>Customer ID</th>
+                <th>#</th>
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Address</th>
@@ -52,9 +52,9 @@ const Customers: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {customerList.map((customer: any) => (
-                <tr key={customer.customer_id}>
-                  <td>{customer.customer_id}</td>
+              {customerList.map((customer: any, index: number) => (
+                <tr key={customer._id}>
+                  <td>{index + 1}</td>
                   <td>{customer.first_name}</td>
                   <td>{customer.last_name}</td>
                   <td>{customer.address}</td>

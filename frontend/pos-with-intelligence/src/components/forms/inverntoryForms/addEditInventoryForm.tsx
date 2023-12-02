@@ -5,7 +5,7 @@ import './addEditInventoryForm.css';
 import Navbar from '../../navigation/nav';
 
 import { useNavigate } from 'react-router-dom';
-import { Container, Form, Button } from 'react-bootstrap'; // Import Bootstrap components
+import { Container, Form, Button, Table } from 'react-bootstrap'; // Import Bootstrap components
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
 
 interface Stock {
@@ -31,7 +31,7 @@ const AddEditInventoryForm: React.FC = () => {
     quantity: 0,
     location: '',
   });
-  
+
   stock.quantity = Number(stock.quantity);
 
   const [unitSerialsAvailable, setUnitSerialsAvailable] = useState<UnitSerial[]>([]);
@@ -47,10 +47,10 @@ const AddEditInventoryForm: React.FC = () => {
   const navigate = useNavigate();
   useEffect(() => {
     // Check for changes in stock-related fields whenever stock or originalQuantity change
-    const hasStockChanges = stock.quantity !== originalQuantity;  
+    const hasStockChanges = stock.quantity !== originalQuantity;
     setStockChangesMade(hasStockChanges);
   }, [stock, originalQuantity]);
-  
+
 
   useEffect(() => {
     // Check for changes in unitSerialsAvailable
@@ -150,7 +150,7 @@ const AddEditInventoryForm: React.FC = () => {
 
   const handleRemoveSerial = (rowNumber: number) => {
     try {
-
+      stock.quantity -= 1;
       const updatedSerials = unitSerialsAvailable.filter((_, idx) => idx !== rowNumber);
       setUnitSerialsAvailable(updatedSerials);
 
@@ -262,21 +262,27 @@ const AddEditInventoryForm: React.FC = () => {
               </Button>
             </div>
           ))}
-
-          {unitSerialsNotAvailable.map((serial, index) => (
-            <div key={index}>
-              <Form.Control
-                type="text"
-                value={serial.serial_number}
-                readOnly // Make the input read-only for not available serials
-              />
-              <Form.Control
-                type="text"
-                value={serial.invoice_id}
-                readOnly // Make the input read-only for not available serials
-              />
-            </div>
-          ))}
+          <br></br>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>Serial Number</th>
+                <th>User by Invoice</th>
+              </tr>
+            </thead>
+            <tbody>
+              {unitSerialsNotAvailable.map((serial, index) => (
+                <tr key={index}>
+                  <td>{serial.serial_number}</td>
+                  <td>
+                    <Button variant="link" href={`/invoice/${serial.invoice_id}`}>
+                      View Invoice
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
           <Button
             type="submit"
             variant={isEditing ? 'info' : 'primary'}

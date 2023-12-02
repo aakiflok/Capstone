@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import {Customers} from './../models/CustomerModel'; 
+import { Invoice } from '../models/InvoiceModel';
 const router = express.Router();
 
 // Create a new customer
@@ -53,9 +54,19 @@ router.patch('/customers/:id', getCustomer, async (req: Request, res: Response) 
 // Delete a customer
 router.delete('/customers/:id', getCustomer, async (req: Request, res: Response) => {
   try {
-    await res.locals.customer.remove();
+    // Check if the customer is associated with any invoices
+    const invoices = await Invoice.find({ customer_id: req.params.id });
+
+    if (invoices.length > 0) {
+      return res.status(201).json({ message: 'Customer cannot be deleted as they are associated with one or more invoices' });
+    }
+
+    const customer = await Customers.findById(req.params.id);
+
+    // If not associated with any invoices, proceed with deletion
+    await customer?.deleteOne();
     res.json({ message: 'Customer deleted' });
-  } catch (err:any) {
+  } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
 });

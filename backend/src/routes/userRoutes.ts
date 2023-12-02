@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import mailgun from 'mailgun-js';
 import 'dotenv/config';
+import { Invoice } from '../models/InvoiceModel';
 const router = express.Router();
 
 const DOMAIN = process.env.MAILGUN_DOMAIN || '';
@@ -148,6 +149,12 @@ router.put('/updateUser/:id', async (req: Request, res: Response) => {
 // Delete a user
 router.delete('/users/:id', getUser, async (req: Request, res: Response) => {
   try {
+
+    const invoices = await Invoice.find({ user_id: req.params.id });
+
+    if (invoices.length > 0) {
+      return res.status(201).json({ message: 'Employee cannot be deleted as they are associated with one or more invoices' });
+    }
     const userId = req.params.id;
     await User.findByIdAndDelete(userId);
     res.json({ message: 'Employee deleted' });

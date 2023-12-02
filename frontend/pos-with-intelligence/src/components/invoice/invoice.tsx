@@ -96,13 +96,14 @@ const Invoice: React.FC = () => {
             <Button variant="outline-secondary" onClick={() => setTotalRange({ min: 0, max: 10000 })}>
               Reset Filters
             </Button>
+            <br></br>
+            <Link to="/addInvoice" className="invoice-tile-link">
+            <Button className="invoice-product-button">Add Invoice</Button>
+          </Link>
           </Col>
 
           {/* Invoice Table Column */}
           <Col md={9}>
-          <Link to="/addInvoice" className="invoice-tile-link">
-            <Button className="invoice-product-button">Add Invoice</Button>
-          </Link>
             <Container>
               <h2>Invoice Content</h2>
               <Table striped bordered hover className="invoice-table">

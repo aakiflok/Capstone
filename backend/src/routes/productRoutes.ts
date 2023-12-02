@@ -4,6 +4,7 @@ import { Stock } from './../models/StockModel';
 import * as cloudinary from 'cloudinary';
 import { Router } from 'express';
 import 'dotenv/config';
+import { Invoice_Item } from '../models/InvoiceItemModel';
 
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDNAME,
@@ -116,22 +117,31 @@ router.patch('/products/:id', async (req: Request, res: Response) => {
 // Delete a product
 router.delete('/products/:id', async (req: Request, res: Response) => {
   try {
+    const productId = req.params.id;
+
+    // Check if the product is part of any invoice items
+    const isProductInInvoice = await Invoice_Item.exists({ product_id: productId });
+
+    if (isProductInInvoice) {
+      return res.status(201).json({ message: 'Cannot delete product as it is part of one or more invoice items' });
+    }
+
     // Fetch the stock record corresponding to the product
-    const stock = await Stock.findOne({ product_id: req.params.id });
+    const stock = await Stock.findOne({ product_id: productId });
 
     if (!stock) {
-      return res.status(404).json({ message: 'Stock record not found for the given product' });
+      return res.status(201).json({ message: 'Stock record not found for the given product' });
     }
 
     // Check stock quantity
     if (stock.quantity > 0) {
-      return res.status(400).json({ message: 'Cannot delete product with stock quantity greater than zero' });
+      return res.status(201).json({ message: 'Cannot delete product with stock quantity greater than zero' });
     }
 
-    // If stock quantity is zero, delete the product
-    const product = await Product.findById(req.params.id);
+    // If stock quantity is zero and the product is not part of any invoice items, delete the product
+    const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(201).json({ message: 'Product not found' });
     }
 
     await product.deleteOne();
@@ -144,5 +154,6 @@ router.delete('/products/:id', async (req: Request, res: Response) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 
 export { router as productRoute };
