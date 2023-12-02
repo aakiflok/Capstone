@@ -231,7 +231,7 @@ const Reports: React.FC = () => {
               </Form.Group>
             </Form>
           </Col>
-          <Col md={6}>
+          <Col md={5}>
             <div>
               <h3 style={{ marginBottom: '20px', paddingBottom: '20px' }}>Bar Chart</h3>
               {renderBarChart()}
@@ -241,12 +241,13 @@ const Reports: React.FC = () => {
               <h3 style={{ marginBottom: '20px', paddingBottom: '20px' }}>Line Chart</h3>
               {renderLineChart()}
             </div>
-          </Col>
-          <Col md={2}>
             <div>
               <h3 style={{ marginBottom: '20px', paddingBottom: '20px' }}>Pie Chart</h3>
               {renderPieChart()}
             </div>
+          </Col>
+          <Col md={3}>
+           
           </Col>
         </Row>
       </Container>
