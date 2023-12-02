@@ -18,13 +18,19 @@ const UserModel_1 = require("./../models/UserModel");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
+const mailgun_js_1 = __importDefault(require("mailgun-js"));
+require("dotenv/config");
+const InvoiceModel_1 = require("../models/InvoiceModel");
 const router = express_1.default.Router();
 exports.userRoute = router;
+const DOMAIN = process.env.MAILGUN_DOMAIN || '';
+const mg = (0, mailgun_js_1.default)({ apiKey: process.env.MAILGUN_API_KEY || '', domain: DOMAIN });
 // Create a new user
 router.post('/addUser', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { first_name, last_name, birthdate, address, username, password, email, role, joining_date } = req.body;
-        const user = new UserModel_1.User({ first_name,
+        const user = new UserModel_1.User({
+            first_name,
             last_name,
             birthdate,
             address,
@@ -32,7 +38,8 @@ router.post('/addUser', (req, res) => __awaiter(void 0, void 0, void 0, function
             password,
             email,
             role,
-            joining_date });
+            joining_date
+        });
         // Set the users properties that came in the request body
         const savedUser = yield user.save();
         res.status(201).json(savedUser);
@@ -40,6 +47,23 @@ router.post('/addUser', (req, res) => __awaiter(void 0, void 0, void 0, function
     catch (err) {
         res.status(400).json({ message: err.message });
     }
+}));
+router.post('/send-email', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, subject, message } = req.body;
+    const mailData = {
+        from: 'aakiflok52.al@gmail.com', // Your verified Mailgun sender
+        to: email,
+        subject: subject,
+        text: message,
+    };
+    mg.messages().send(mailData, (error, body) => {
+        if (error) {
+            console.error('Error sending email:', error);
+            return res.status(500).send({ error: error.message });
+        }
+        console.log('Email sent', body);
+        res.status(200).json({ message: 'Email sent successfully' });
+    });
 }));
 // Get all users
 router.get('/users', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -113,8 +137,13 @@ router.put('/updateUser/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
 // Delete a user
 router.delete('/users/:id', getUser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield res.locals.user.remove();
-        res.json({ message: 'User deleted' });
+        const invoices = yield InvoiceModel_1.Invoice.find({ user_id: req.params.id });
+        if (invoices.length > 0) {
+            return res.status(201).json({ message: 'Employee cannot be deleted as they are associated with one or more invoices' });
+        }
+        const userId = req.params.id;
+        yield UserModel_1.User.findByIdAndDelete(userId);
+        res.json({ message: 'Employee deleted' });
     }
     catch (err) {
         res.status(500).json({ message: err.message });

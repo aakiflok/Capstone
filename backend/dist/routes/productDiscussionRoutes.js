@@ -16,9 +16,9 @@ exports.productDicussionRoute = void 0;
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const DiscussionModel_1 = require("../models/DiscussionModel");
+const UserModel_1 = require("../models/UserModel");
 const router = express_1.default.Router();
 exports.productDicussionRoute = router;
-// Create a new product message
 router.post('/products/:productId/messages/:userId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { productId, userId } = req.params;
@@ -26,20 +26,23 @@ router.post('/products/:productId/messages/:userId', (req, res) => __awaiter(voi
         if (!mongoose_1.default.Types.ObjectId.isValid(productId) || !mongoose_1.default.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({ message: 'Invalid Product or User ID format.' });
         }
-        // Convert to ObjectId
-        const productObjectId = new mongoose_1.default.Types.ObjectId(productId);
-        const userObjectId = new mongoose_1.default.Types.ObjectId(userId);
+        // Fetch user's first and last name based on userId
+        const user = yield UserModel_1.User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
         // Log the received data for debugging
         console.log('Received Data:', { productId, userId, message });
         const productMessage = new DiscussionModel_1.Discussions({
-            product_id: productObjectId,
-            user_id: userObjectId,
+            product_id: productId,
+            user_id: userId,
             message,
         });
         yield productMessage.save();
         // Log success message for debugging
         console.log('Message saved successfully:', productMessage);
-        res.status(201).json(productMessage);
+        // Send the response with user's first and last name
+        res.status(201).json(Object.assign(Object.assign({}, productMessage.toObject()), { first_name: user.first_name, last_name: user.last_name, role: user.role }));
     }
     catch (error) {
         console.error('Error:', error);
@@ -55,7 +58,13 @@ router.get('/products/:productId/messages', (req, res) => __awaiter(void 0, void
             return res.status(400).json({ message: 'Invalid Product ID format.' });
         }
         const productObjectId = new mongoose_1.default.Types.ObjectId(productId);
-        const messages = yield DiscussionModel_1.Discussions.find({ product_id: productObjectId }).sort({ createdAt: 'asc' });
+        // Fetch messages and populate user details
+        const messages = yield DiscussionModel_1.Discussions.find({ product_id: productObjectId })
+            .populate({
+            path: 'user_id',
+            select: 'first_name last_name role', // Select the fields you want
+        })
+            .sort({ createdAt: 'asc' });
         res.status(200).json(messages);
     }
     catch (error) {

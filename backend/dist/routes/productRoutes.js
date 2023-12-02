@@ -37,10 +37,12 @@ const ProductModel_1 = require("./../models/ProductModel");
 const StockModel_1 = require("./../models/StockModel");
 const cloudinary = __importStar(require("cloudinary"));
 const express_1 = require("express");
+require("dotenv/config");
+const InvoiceItemModel_1 = require("../models/InvoiceItemModel");
 cloudinary.v2.config({
-    cloud_name: 'dxrohnluu',
-    api_key: '278171197627713',
-    api_secret: 'I92bDNPLwfsA5Ba2KFcw9LLRvgg',
+    cloud_name: process.env.CLOUDNAME,
+    api_key: process.env.CLOUDAPIKEY,
+    api_secret: process.env.CLOUDINARYSECRET,
     secure: true
 });
 const router = (0, express_1.Router)();
@@ -61,7 +63,7 @@ router.post('/products', (req, res) => __awaiter(void 0, void 0, void 0, functio
         // Save the new product to the database
         const savedProduct = yield newProduct.save();
         const newStock = new StockModel_1.Stock({
-            product_id: savedProduct._id,
+            product_id: savedProduct._id, // Using the ID of the product we just saved
             quantity: 0,
             location: 'not stock' // You can adjust this as per your requirements
         });
@@ -138,19 +140,25 @@ router.patch('/products/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
 // Delete a product
 router.delete('/products/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const productId = req.params.id;
+        // Check if the product is part of any invoice items
+        const isProductInInvoice = yield InvoiceItemModel_1.Invoice_Item.exists({ product_id: productId });
+        if (isProductInInvoice) {
+            return res.status(201).json({ message: 'Cannot delete product as it is part of one or more invoice items' });
+        }
         // Fetch the stock record corresponding to the product
-        const stock = yield StockModel_1.Stock.findOne({ product_id: req.params.id });
+        const stock = yield StockModel_1.Stock.findOne({ product_id: productId });
         if (!stock) {
-            return res.status(404).json({ message: 'Stock record not found for the given product' });
+            return res.status(201).json({ message: 'Stock record not found for the given product' });
         }
         // Check stock quantity
         if (stock.quantity > 0) {
-            return res.status(400).json({ message: 'Cannot delete product with stock quantity greater than zero' });
+            return res.status(201).json({ message: 'Cannot delete product with stock quantity greater than zero' });
         }
-        // If stock quantity is zero, delete the product
-        const product = yield ProductModel_1.Product.findById(req.params.id);
+        // If stock quantity is zero and the product is not part of any invoice items, delete the product
+        const product = yield ProductModel_1.Product.findById(productId);
         if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
+            return res.status(201).json({ message: 'Product not found' });
         }
         yield product.deleteOne();
         // Delete the corresponding stock record

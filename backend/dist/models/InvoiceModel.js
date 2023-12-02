@@ -16,11 +16,14 @@ const invoiceSchema = new mongoose_1.default.Schema({
         ref: 'User',
         required: true,
     },
-    total: { type: Number, required: true },
-    delivery_status: { type: Boolean, required: true },
-    date: { type: Date, required: true },
-    payment_status: { type: Boolean, required: true },
-    payment_id: { type: Number, required: true },
+    total: { type: Number },
+    delivery_status: { type: Boolean },
+    date: { type: Date },
+    payment_status: { type: Boolean },
+    payment_id: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: 'PaymentDetails'
+    },
 });
 const Invoice = mongoose_1.default.model('Invoice', invoiceSchema);
 exports.Invoice = Invoice;

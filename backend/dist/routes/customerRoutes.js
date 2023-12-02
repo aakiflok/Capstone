@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.customerRoute = void 0;
 const express_1 = __importDefault(require("express"));
 const CustomerModel_1 = require("./../models/CustomerModel");
+const InvoiceModel_1 = require("../models/InvoiceModel");
 const router = express_1.default.Router();
 exports.customerRoute = router;
 // Create a new customer
@@ -65,7 +66,14 @@ router.patch('/customers/:id', getCustomer, (req, res) => __awaiter(void 0, void
 // Delete a customer
 router.delete('/customers/:id', getCustomer, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield res.locals.customer.remove();
+        // Check if the customer is associated with any invoices
+        const invoices = yield InvoiceModel_1.Invoice.find({ customer_id: req.params.id });
+        if (invoices.length > 0) {
+            return res.status(201).json({ message: 'Customer cannot be deleted as they are associated with one or more invoices' });
+        }
+        const customer = yield CustomerModel_1.Customers.findById(req.params.id);
+        // If not associated with any invoices, proceed with deletion
+        yield (customer === null || customer === void 0 ? void 0 : customer.deleteOne());
         res.json({ message: 'Customer deleted' });
     }
     catch (err) {

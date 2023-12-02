@@ -17,15 +17,28 @@ const express_1 = __importDefault(require("express"));
 const UnitSerialModel_1 = require("./../models/UnitSerialModel");
 const router = express_1.default.Router();
 exports.unitSerialRoute = router;
-//get all serail value with a specific stock id
+// Get all serial values with a specific stock id
 router.get('/unit-serials-by-stock/:stockId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const stockId = req.params.stockId;
         const unitSerialsForStock = yield UnitSerialModel_1.Unit_Serial.find({ stock_id: stockId });
-        if (unitSerialsForStock.length === 0) {
-            return res.status(404).json({ message: 'No unit serial records found for this stock_id' });
-        }
         res.status(200).json(unitSerialsForStock);
+    }
+    catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}));
+// Delete all unit serial records for a specific stock
+// Delete available unit serial records for a specific stock
+// Delete unit serial records by stock ID
+router.delete('/unit-serials-by-stock/:stockId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const stockId = req.params.stockId;
+        // Find all available unit serial records for the specified stock ID
+        const unitSerialsToDelete = yield UnitSerialModel_1.Unit_Serial.find({ stock_id: stockId, isAvailable: true });
+        // Delete all the available unit serial records
+        yield UnitSerialModel_1.Unit_Serial.deleteMany({ _id: { $in: unitSerialsToDelete.map(serial => serial._id) } });
+        res.json({ message: 'Unit serial records deleted' });
     }
     catch (err) {
         res.status(500).json({ message: err.message });
