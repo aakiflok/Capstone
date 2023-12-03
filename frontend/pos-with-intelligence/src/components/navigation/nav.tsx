@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useSignOut } from 'react-auth-kit';
 import { Navbar as BootstrapNavbar, Nav } from 'react-bootstrap'; 
 
 const Navbar = () => {
   const [user, setUser] = useState<any | null>(null); // Use the appropriate type for your user object
   const navigate = useNavigate();
+  const signOut = useSignOut();
   useEffect(() => {
     const token = Cookies.get('_auth');
     const authState = Cookies.get('_auth_state');
@@ -18,9 +20,9 @@ const Navbar = () => {
     }
   }, []);
 
-  const handleLogout = async () => {
+  const HandleLogout = async () => {
     // 1. Clear the authentication cookie
-    document.cookie = "_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    signOut();
     navigate("/login");
   };
   // Define user roles (you may have a more structured way to handle roles)
@@ -43,7 +45,7 @@ const Navbar = () => {
           </Nav>
         <Nav>
           <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
-          <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+          <Nav.Link onClick={HandleLogout}>Logout</Nav.Link>
         </Nav>
       </BootstrapNavbar.Collapse>
     </BootstrapNavbar>
