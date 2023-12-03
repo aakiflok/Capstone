@@ -51,7 +51,7 @@ const PaymentForm: React.FC = () => {
 
 
           try {
-            const response = await axios.post('http://localhost:3001/process-payment', {
+            const response = await axios.post('https://pos-crud.onrender.com/process-payment', {
               paymentMethodId: createdPaymentMethod.id,
               invoiceId: id
             });
@@ -83,14 +83,6 @@ const PaymentForm: React.FC = () => {
                   id="credit_card"
                   onChange={() => setPaymentMethod('credit_card')}
                   checked={paymentMethod === 'credit_card'}
-                />
-                <Form.Check
-                  type="radio"
-                  label="Cash"
-                  name="paymentMethod"
-                  id="cash"
-                  onChange={() => setPaymentMethod('cash')}
-                  checked={paymentMethod === 'cash'}
                 />
               </Form.Group>
 

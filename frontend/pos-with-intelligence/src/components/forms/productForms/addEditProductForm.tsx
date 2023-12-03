@@ -38,7 +38,7 @@ const AddEditProductForm = () => {
   useEffect(() => {
     // If it's an edit operation (ID is available in params), fetch the product data
     if (isEditing) {
-      axios.get(`http://localhost:3001/products/${id}`)
+      axios.get(`https://pos-crud.onrender.com/products/${id}`)
         .then((response) => {
           // Set the form fields with existing product data
           setProduct(response.data);
@@ -81,11 +81,12 @@ const AddEditProductForm = () => {
     e.preventDefault();
     if (isEditing) {
       // If it's an edit operation, send a PUT request to update the product
-      axios.put(`http://localhost:3001/products/${id}`, product)
+      axios.put(`https://pos-crud.onrender.com/products/${id}`, product)
+      navigate("/products");
     } else {
       // If it's not an edit operation, send a POST request to create a new product
-      axios.post('http://localhost:3001/products', product)
-
+      axios.post('https://pos-crud.onrender.com/products', product)
+      navigate("/products");
     }
   };
 
@@ -94,7 +95,7 @@ const AddEditProductForm = () => {
     if (files && files[0]) {
       setUploadingImage(true);
 
-      axios.get<{ signature: string; timestamp: number }>('http://localhost:3001/get-signature')
+      axios.get<{ signature: string; timestamp: number }>('https://pos-crud.onrender.com/get-signature')
         .then(response => {
           const { signature, timestamp } = response.data;
           const formData = new FormData();
@@ -216,6 +217,7 @@ const AddEditProductForm = () => {
               name="image"
               onChange={handleImageUpload}
               disabled={uploadingImage}
+              required
             />
             {uploadingImage && <p>Uploading image...</p>}
             {product.image_uri && (

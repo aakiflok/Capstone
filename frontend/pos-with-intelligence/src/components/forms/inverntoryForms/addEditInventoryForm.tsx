@@ -64,12 +64,12 @@ const AddEditInventoryForm: React.FC = () => {
 
     if (isEditing) {
       axios
-        .get(`http://localhost:3001/stock/${id}`)
+        .get(`https://pos-crud.onrender.com/stock/${id}`)
         .then((response) => {
           setStock(response.data);
           setOriginalQuantity(response.data.quantity);
           axios
-            .get(`http://localhost:3001/unit-serials-by-stock/${id}`)
+            .get(`https://pos-crud.onrender.com/unit-serials-by-stock/${id}`)
             .then((res) => {
               const availableSerials = res.data.filter((serial: UnitSerial) => serial.isAvailable);
               const notAvailableSerials = res.data.filter((serial: UnitSerial) => !serial.isAvailable);
@@ -134,7 +134,7 @@ const AddEditInventoryForm: React.FC = () => {
       try {
         const responses = await Promise.all(
           newSerials.map((newSerial) =>
-            axios.post('http://localhost:3001/addUnitSerial', newSerial)
+            axios.post('https://pos-crud.onrender.com/addUnitSerial', newSerial)
           )
         );
 
@@ -169,7 +169,7 @@ const AddEditInventoryForm: React.FC = () => {
     try {
       if (isEditing) {
         // Delete the old serial numbers related to the stock
-        await axios.delete(`http://localhost:3001/unit-serials-by-stock/${id}`);
+        await axios.delete(`https://pos-crud.onrender.com/unit-serials-by-stock/${id}`);
 
         // Add all the new serial numbers from the array to the unit serials
         console.log('unitSerialsAvailable', unitSerialsAvailable);
@@ -178,7 +178,7 @@ const AddEditInventoryForm: React.FC = () => {
             // Update the stock_id property
             newSerial.stock_id = id;
             try {
-              const response = await axios.post('http://localhost:3001/addUnitSerial', newSerial);
+              const response = await axios.post('https://pos-crud.onrender.com/addUnitSerial', newSerial);
               console.log('Added new serial:', response.data);
               return response.data;
             } catch (error) {
@@ -191,17 +191,17 @@ const AddEditInventoryForm: React.FC = () => {
         stock.quantity = unitSerialsAvailable.length;
 
         // Update the stock data
-        await axios.patch(`http://localhost:3001/stock/${id}`, stock);
+        await axios.patch(`https://pos-crud.onrender.com/stock/${id}`, stock);
         console.log('Stock updated:', stock);
       } else {
         // Add the stock data
-        const response = await axios.post('http://localhost:3001/addStock', stock);
+        const response = await axios.post('https://pos-crud.onrender.com/addStock', stock);
         console.log('Stock added:', response.data);
 
         // Add all the new serial numbers from the array to the unit serials
         await Promise.all(
           unitSerialsAvailable.map((newSerial) =>
-            axios.post('http://localhost:3001/addUnitSerial', newSerial)
+            axios.post('https://pos-crud.onrender.com/addUnitSerial', newSerial)
           )
         );
       }

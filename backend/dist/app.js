@@ -27,7 +27,7 @@ const app = (0, express_1.default)();
 exports.app = app;
 app.set('trust proxy', true);
 app.use((0, body_parser_1.json)());
-app.use((0, cors_1.default)({ origin: 'http://localhost:3000',
+app.use((0, cors_1.default)({ origin: 'https://pos-system-ig9m.onrender.com',
     optionsSuccessStatus: 200 }));
 app.use(customerRoutes_1.customerRoute);
 app.use(userRoutes_1.userRoute);

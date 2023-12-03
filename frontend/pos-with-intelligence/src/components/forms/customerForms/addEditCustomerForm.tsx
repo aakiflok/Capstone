@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import Navbar from '../../navigation/nav';
 import './addEditCustomerForm.css'
-
+import { useNavigate } from 'react-router-dom';
 interface Customer {
     first_name: string;
     last_name: string;
@@ -18,7 +18,7 @@ interface Customer {
 const AddEditCustomerForm: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const isEditing = !!id;
-
+    const navigate = useNavigate();
     const [customer, setCustomer] = useState<Customer>({
         first_name: '',
         last_name: '',
@@ -26,7 +26,7 @@ const AddEditCustomerForm: React.FC = () => {
 
     useEffect(() => {
         if (isEditing) {
-            axios.get(`http://localhost:3001/customers/${id}`)
+            axios.get(`https://pos-crud.onrender.com/customers/${id}`)
                 .then((response) => {
                     setCustomer(response.data);
                 })
@@ -41,24 +41,14 @@ const AddEditCustomerForm: React.FC = () => {
         setCustomer(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (isEditing) {
-            axios.patch(`http://localhost:3001/customers/${id}`, customer)
-                .then(response => {
-                    console.log('Customer updated:', response.data);
-                })
-                .catch(error => {
-                    console.error('Error updating customer:', error);
-                });
+            await axios.patch(`https://pos-crud.onrender.com/customers/${id}`, customer)
+            navigate("/customers");
         } else {
-            axios.post('http://localhost:3001/customers', customer)
-                .then(response => {
-                    console.log('Customer added:', response.data);
-                })
-                .catch(error => {
-                    console.error('Error adding customer:', error);
-                });
+            await axios.post('https://pos-crud.onrender.com/customers', customer)
+            navigate("/customers");
         }
     };
     // ... (rest of the imports and component setup)
@@ -99,6 +89,7 @@ const AddEditCustomerForm: React.FC = () => {
                             name="address"
                             value={customer.address || ''}
                             onChange={handleInputChange}
+                            required
                         />
                     </div>
                     <div className="form-group">
@@ -109,6 +100,29 @@ const AddEditCustomerForm: React.FC = () => {
                             name="city"
                             value={customer.city || ''}
                             onChange={handleInputChange}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="state">State:</label>
+                        <input
+                            type="text"
+                            id="state"
+                            name="state"
+                            value={customer.state || ''}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="zip_code">Zip Code:</label>
+                        <input
+                            type="text"
+                            id="zip_code"
+                            name="zip_code"
+                            value={customer.zip_code || ''}
+                            onChange={handleInputChange}
+                            required
                         />
                     </div>
                     <div className="form-group">
@@ -129,26 +143,7 @@ const AddEditCustomerForm: React.FC = () => {
                             name="phone_number"
                             value={customer.phone_number || ''}
                             onChange={handleInputChange}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="state">State:</label>
-                        <input
-                            type="text"
-                            id="state"
-                            name="state"
-                            value={customer.state || ''}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="zip_code">Zip Code:</label>
-                        <input
-                            type="text"
-                            id="zip_code"
-                            name="zip_code"
-                            value={customer.zip_code || ''}
-                            onChange={handleInputChange}
+                            required
                         />
                     </div>
                     <div className="form-action">

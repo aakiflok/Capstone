@@ -10,20 +10,35 @@ const Invoice: React.FC = () => {
   const [filteredInvoices, setFilteredInvoices] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [deliveryStatusFilter, setDeliveryStatusFilter] = useState(false);
-  const [totalRange, setTotalRange] = useState({ min: 0, max: 10000 });
+  const [totalRange, setTotalRange] = useState({ min: 0, max: 0 });
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/invoices');
-        setInvoiceList(response.data);
-        setFilteredInvoices(response.data);
+        const response = await axios.get('https://pos-crud.onrender.com/invoices');
+        const invoices = response.data;
+    
+        // Calculate the maximum total
+        let maxTotal = 0;
+        for (const invoice of invoices) {
+          if (invoice.total && (invoice.total > maxTotal || maxTotal === 0)) {
+            maxTotal = invoice.total;
+          }
+        }
+    
+        // Update the totalRange state
+        setTotalRange({ min: 0, max: maxTotal });
+    
+        // Set the invoice list and filtered invoices
+        setInvoiceList(invoices);
+        setFilteredInvoices(invoices);
       } catch (error) {
         console.error('Error fetching invoice data:', error);
       }
     };
 
+   
     fetchInvoices();
   }, []);
 
@@ -93,9 +108,6 @@ const Invoice: React.FC = () => {
                 />
               </Form.Group>
             </Form>
-            <Button variant="outline-secondary" onClick={() => setTotalRange({ min: 0, max: 10000 })}>
-              Reset Filters
-            </Button>
             <br></br>
             <Link to="/addInvoice" className="invoice-tile-link">
             <Button className="invoice-product-button">Add Invoice</Button>

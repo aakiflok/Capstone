@@ -51,8 +51,7 @@ const Reports: React.FC = () => {
     labels: [],
     datasets: [],
   });
-
-  const [lineChartData, setLineChartData] = useState<ChartData<'line', number[], string>>({
+  const [lineChartData, setLineChartData] = useState<ChartData<"line", number[], string>>({
     labels: [],
     datasets: [
       {
@@ -80,6 +79,9 @@ const Reports: React.FC = () => {
       const barData = await fetchBarChartData(startDate, endDate);
       setBarChartData(barData);
       const lineData = await fetchLineChartData();
+      if (lineData !== undefined) {
+        setLineChartData(lineData);
+      }
       
       const pieData = await fetchPieChartData();
       setPieChartData(pieData);
@@ -90,7 +92,7 @@ const Reports: React.FC = () => {
 
   const fetchBarChartData = async (startDate: string, endDate: string) => {
     try {
-      const response = await axios.get('http://localhost:3001/stock-bar-chart-data', {
+      const response = await axios.get('https://pos-crud.onrender.com/stock-bar-chart-data', {
         params: { startDate, endDate },
       });
       return response.data;
@@ -102,7 +104,7 @@ const Reports: React.FC = () => {
 
   const fetchLineChartData = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/monthly-sales');
+      const response = await axios.get('https://pos-crud.onrender.com/monthly-sales');
       const monthlySalesData = response.data;
 
       // Transform the data as needed for your line chart
@@ -138,7 +140,7 @@ const Reports: React.FC = () => {
 
   const fetchPieChartData = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/monthly-sales-by-category');
+      const response = await axios.get('https://pos-crud.onrender.com/monthly-sales-by-category');
       const pieData = response.data;
 
       // Apply filters to the data based on selected categories
@@ -213,28 +215,6 @@ const Reports: React.FC = () => {
           <Col md={2} className="mb-3">
             <h2>Filters</h2>
             <Form>
-              <Form.Group controlId="startDate">
-                <Form.Label>Start Date</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={startDate}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setStartDate(e.currentTarget.value)
-                  }
-                />
-              </Form.Group>
-
-              <Form.Group controlId="endDate">
-                <Form.Label>End Date</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={endDate}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setEndDate(e.currentTarget.value)
-                  }
-                />
-              </Form.Group>
-
               <Form.Group>
                 <Form.Label>Categories</Form.Label>
                 {categoryOptions.map((category, index) => (
@@ -251,7 +231,7 @@ const Reports: React.FC = () => {
               </Form.Group>
             </Form>
           </Col>
-          <Col md={6}>
+          <Col md={5}>
             <div>
               <h3 style={{ marginBottom: '20px', paddingBottom: '20px' }}>Bar Chart</h3>
               {renderBarChart()}
@@ -261,12 +241,13 @@ const Reports: React.FC = () => {
               <h3 style={{ marginBottom: '20px', paddingBottom: '20px' }}>Line Chart</h3>
               {renderLineChart()}
             </div>
-          </Col>
-          <Col md={2}>
             <div>
               <h3 style={{ marginBottom: '20px', paddingBottom: '20px' }}>Pie Chart</h3>
               {renderPieChart()}
             </div>
+          </Col>
+          <Col md={3}>
+           
           </Col>
         </Row>
       </Container>

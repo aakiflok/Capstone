@@ -11,7 +11,7 @@ const InvoiceView: React.FC = () => {
   useEffect(() => {
     const fetchInvoiceData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/invoices/${id}`);
+        const response = await axios.get(`https://pos-crud.onrender.com/invoices/${id}`);
         setInvoiceData(response.data);
       } catch (err) {
         console.error("Error fetching invoice data:", err);
