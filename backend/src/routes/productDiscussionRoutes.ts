@@ -1,15 +1,19 @@
+// Import necessary modules and models
 import express from 'express';
 import mongoose from 'mongoose';
 import { Discussions } from '../models/DiscussionModel';
 import { User } from '../models/UserModel';
+
+// Create an instance of an Express router
 const router = express.Router();
 
-
+// Route to post a message for a specific product and user
 router.post('/products/:productId/messages/:userId', async (req, res) => {
   try {
     const { productId, userId } = req.params;
     const { message } = req.body;
 
+    // Validate the format of product and user IDs
     if (!mongoose.Types.ObjectId.isValid(productId) || !mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: 'Invalid Product or User ID format.' });
     }
@@ -24,6 +28,7 @@ router.post('/products/:productId/messages/:userId', async (req, res) => {
     // Log the received data for debugging
     console.log('Received Data:', { productId, userId, message });
 
+    // Create and save a new message document
     const productMessage = new Discussions({
       product_id: productId,
       user_id: userId,
@@ -50,13 +55,12 @@ router.post('/products/:productId/messages/:userId', async (req, res) => {
   }
 });
 
-
-// Retrieve all messages for a specific product
-
+// Route to retrieve all messages for a specific product
 router.get('/products/:productId/messages', async (req, res) => {
   try {
     const { productId } = req.params;
 
+    // Validate the format of the product ID
     if (!mongoose.Types.ObjectId.isValid(productId)) {
       return res.status(400).json({ message: 'Invalid Product ID format.' });
     }
@@ -72,10 +76,10 @@ router.get('/products/:productId/messages', async (req, res) => {
       .sort({ createdAt: 'asc' });
 
     res.status(200).json(messages);
-  } catch (error:any) {
+  } catch (error: any) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
-export { router as productDicussionRoute };
+export { router as productDiscussionRoute };

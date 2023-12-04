@@ -1,3 +1,4 @@
+// Import necessary modules and models
 import express, { Request, Response } from 'express';
 import { User } from './../models/UserModel';
 import jwt from 'jsonwebtoken';
@@ -11,7 +12,7 @@ const router = express.Router();
 const DOMAIN = process.env.MAILGUN_DOMAIN || '';
 const mg = mailgun({ apiKey: process.env.MAILGUN_API_KEY || '', domain: DOMAIN });
 
-// Create a new user
+// Route to create a new user
 router.post('/addUser', async (req: Request, res: Response) => {
   try {
     const {
@@ -37,7 +38,6 @@ router.post('/addUser', async (req: Request, res: Response) => {
       role,
       joining_date
     });
-    // Set the users properties that came in the request body
 
     const savedUser = await user.save();
     res.status(201).json(savedUser);
@@ -46,8 +46,7 @@ router.post('/addUser', async (req: Request, res: Response) => {
   }
 });
 
-
-
+// Route to send an email
 router.post('/send-email', async (req: Request, res: Response) => {
   const { email, subject, message } = req.body;
 
@@ -67,7 +66,8 @@ router.post('/send-email', async (req: Request, res: Response) => {
     res.status(200).json({ message: 'Email sent successfully' });
   });
 });
-// Get all users
+
+// Route to get all users
 router.get('/users', async (req: Request, res: Response) => {
   try {
     const users = await User.find();
@@ -77,7 +77,7 @@ router.get('/users', async (req: Request, res: Response) => {
   }
 });
 
-// Get a specific user
+// Route to get a specific user by ID
 router.get('/users/:id', getUser, async (req: Request, res: Response) => {
   try {
     const userId = req.params.id;
@@ -93,6 +93,7 @@ router.get('/users/:id', getUser, async (req: Request, res: Response) => {
   }
 });
 
+// Route to update a user by ID
 router.put('/updateUser/:id', async (req: Request, res: Response) => {
   try {
     const {
@@ -143,10 +144,7 @@ router.put('/updateUser/:id', async (req: Request, res: Response) => {
   }
 });
 
-
-
-
-// Delete a user
+// Route to delete a user by ID
 router.delete('/users/:id', getUser, async (req: Request, res: Response) => {
   try {
 
@@ -163,6 +161,7 @@ router.delete('/users/:id', getUser, async (req: Request, res: Response) => {
   }
 });
 
+// Route to log in a user
 router.post('/users/login', cors(), async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
@@ -178,7 +177,7 @@ router.post('/users/login', cors(), async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const isPasswordValid = password == user.password
+    const isPasswordValid = password == user.password;
 
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid credentials' });
@@ -197,7 +196,7 @@ router.post('/users/login', cors(), async (req: Request, res: Response) => {
   }
 });
 
-
+// Middleware function to get a user by ID
 async function getUser(req: Request, res: Response, next: Function) {
   try {
     const user = await User.findById(req.params.id);

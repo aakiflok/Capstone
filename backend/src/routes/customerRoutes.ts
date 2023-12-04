@@ -1,32 +1,37 @@
 import express, { Request, Response } from 'express';
-import {Customers} from './../models/CustomerModel'; 
+import { Customers } from './../models/CustomerModel';
 import { Invoice } from '../models/InvoiceModel';
+
 const router = express.Router();
 
 // Create a new customer
 router.post('/customers', async (req: Request, res: Response) => {
   try {
+    // Create a new customer using the request body
     const customer = new Customers(req.body);
+    // Save the new customer to the database
     const savedCustomer = await customer.save();
     res.status(201).json(savedCustomer);
   } catch (err: any) {
+    // Handle errors and send an error response
     res.status(400).json({ message: err.message });
   }
 });
 
 // Get all customers
 router.get('/customers', async (req: Request, res: Response) => {
-
   try {
+    // Retrieve all customers from the database
     const customers = await Customers.find();
     res.status(200).json(customers);
   } catch (err: any) {
+    // Handle errors and send an error response
     res.status(500).json({ message: err.message });
   }
 });
 
 // Get a specific customer
-router.get('/customers/:id',getCustomer, (req: Request, res: Response) => {
+router.get('/customers/:id', getCustomer, (req: Request, res: Response) => {
   res.status(200).json(res.locals.customer);
 });
 
@@ -44,9 +49,11 @@ router.patch('/customers/:id', getCustomer, async (req: Request, res: Response) 
   // Update other fields similarly
 
   try {
+    // Save the updated customer to the database
     const updatedCustomer = await res.locals.customer.save();
     res.json(updatedCustomer);
   } catch (err: any) {
+    // Handle errors and send an error response
     res.status(400).json({ message: err.message });
   }
 });
@@ -67,21 +74,25 @@ router.delete('/customers/:id', getCustomer, async (req: Request, res: Response)
     await customer?.deleteOne();
     res.json({ message: 'Customer deleted' });
   } catch (err: any) {
+    // Handle errors and send an error response
     res.status(500).json({ message: err.message });
   }
 });
 
+// Middleware function to get a customer by ID
 async function getCustomer(req: Request, res: Response, next: Function) {
-    try {
-      const customer = await Customers.findById(req.params.id);
-      if (customer == null) {
-        return res.status(404).json({ message: 'Customer not found' });
-      }
-      res.locals.customer = customer;
-      next();
-    } catch (err: any) {
-      return res.status(500).json({ message: err.message });
+  try {
+    // Find a customer by ID
+    const customer = await Customers.findById(req.params.id);
+    if (customer == null) {
+      return res.status(404).json({ message: 'Customer not found' });
     }
+    res.locals.customer = customer;
+    next();
+  } catch (err: any) {
+    // Handle errors and send an error response
+    return res.status(500).json({ message: err.message });
   }
-  
-  export {router as customerRoute};
+}
+
+export { router as customerRoute };

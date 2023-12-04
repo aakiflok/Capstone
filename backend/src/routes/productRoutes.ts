@@ -1,3 +1,4 @@
+// Import necessary modules and models
 import express, { Request, Response } from 'express';
 import { Product } from './../models/ProductModel';
 import { Stock } from './../models/StockModel';
@@ -6,6 +7,7 @@ import { Router } from 'express';
 import 'dotenv/config';
 import { Invoice_Item } from '../models/InvoiceItemModel';
 
+// Configure Cloudinary with API credentials
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDNAME,
   api_key: process.env.CLOUDAPIKEY,
@@ -14,6 +16,8 @@ cloudinary.v2.config({
 });
 
 const router = Router();
+
+// Route to create a new product
 router.post('/products', async (req: Request, res: Response) => {
   try {
     // Get product data from the request body
@@ -31,20 +35,22 @@ router.post('/products', async (req: Request, res: Response) => {
 
     // Save the new product to the database
     const savedProduct = await newProduct.save();
+
+    // Create a stock entry for the new product
     const newStock = new Stock({
-      product_id: savedProduct._id, // Using the ID of the product we just saved
+      product_id: savedProduct._id,
       quantity: 0,
-      location: 'not stock' // You can adjust this as per your requirements
+      location: 'not stock'
     });
 
     await newStock.save(); // Save the stock entry
-    res.status(201).json(savedProduct._id);
+    res.status(201).json(savedProduct._id); // Respond with the ID of the saved product
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Get all products
+// Route to get all products
 router.get('/products', async (req: Request, res: Response) => {
   try {
     const products = await Product.find();
@@ -54,7 +60,7 @@ router.get('/products', async (req: Request, res: Response) => {
   }
 });
 
-// Get a specific product by ID
+// Route to get a specific product by ID
 router.get('/products/:id', async (req: Request, res: Response) => {
   try {
     const productId = req.params.id;
@@ -70,7 +76,7 @@ router.get('/products/:id', async (req: Request, res: Response) => {
   }
 });
 
-
+// Route to get a Cloudinary signature for image uploads
 router.get('/get-signature', (req: Request, res: Response) => {
   const timestamp = Math.round(new Date().getTime() / 1000);
   
@@ -89,7 +95,7 @@ router.get('/get-signature', (req: Request, res: Response) => {
   res.json({ signature, timestamp });
 });
 
-// Update a product
+// Route to update a product
 router.patch('/products/:id', async (req: Request, res: Response) => {
   try {
     const { name, price, category, description, image_uri } = req.body;
@@ -106,7 +112,7 @@ router.patch('/products/:id', async (req: Request, res: Response) => {
     if (description) product.description = description;
     if (image_uri) product.image_uri = image_uri;
 
-    await product.save(); // save the changes to the database
+    await product.save(); // Save the changes to the database
 
     res.status(200).json(product);
   } catch (err: any) {
@@ -114,7 +120,7 @@ router.patch('/products/:id', async (req: Request, res: Response) => {
   }
 });
 
-// Delete a product
+// Route to delete a product
 router.delete('/products/:id', async (req: Request, res: Response) => {
   try {
     const productId = req.params.id;
@@ -154,6 +160,5 @@ router.delete('/products/:id', async (req: Request, res: Response) => {
     res.status(500).json({ message: err.message });
   }
 });
-
 
 export { router as productRoute };

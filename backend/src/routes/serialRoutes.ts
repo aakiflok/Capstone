@@ -1,10 +1,11 @@
+// Import necessary modules and models
 import express, { Request, Response } from 'express';
 import { Unit_Serial } from './../models/UnitSerialModel';
 import { Product } from '../models/ProductModel';
 
 const router = express.Router();
 
-// Get all serial values with a specific stock id
+// Route to get all serial values with a specific stock id
 router.get('/unit-serials-by-stock/:stockId', async (req: Request, res: Response) => {
   try {
     const stockId = req.params.stockId;
@@ -15,16 +16,13 @@ router.get('/unit-serials-by-stock/:stockId', async (req: Request, res: Response
   }
 });
 
-// Delete all unit serial records for a specific stock
-// Delete available unit serial records for a specific stock
-// Delete unit serial records by stock ID
+// Route to delete all unit serial records for a specific stock
 router.delete('/unit-serials-by-stock/:stockId', async (req: Request, res: Response) => {
   try {
     const stockId = req.params.stockId;
 
     // Find all available unit serial records for the specified stock ID
     const unitSerialsToDelete = await Unit_Serial.find({ stock_id: stockId, isAvailable: true });
-
 
     // Delete all the available unit serial records
     await Unit_Serial.deleteMany({ _id: { $in: unitSerialsToDelete.map(serial => serial._id) } });
@@ -35,9 +33,7 @@ router.delete('/unit-serials-by-stock/:stockId', async (req: Request, res: Respo
   }
 });
 
-
-
-// Delete a unit serial record
+// Route to delete a unit serial record by its ID
 router.delete('/unit-serial/:id', async (req: Request, res: Response) => {
   try {
     const unitSerial = await Unit_Serial.findById(req.params.id);
@@ -52,7 +48,7 @@ router.delete('/unit-serial/:id', async (req: Request, res: Response) => {
   }
 });
 
-// Add a new unit serial record
+// Route to add a new unit serial record
 router.post('/addUnitSerial', async (req: Request, res: Response) => {
   try {
     const newSerial = new Unit_Serial({

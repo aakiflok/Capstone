@@ -11,6 +11,7 @@ import Stripe from 'stripe';
 import PaymentDetail from '../models/PaymentDetailModel';
 const router = express.Router();
 
+// Define an interface for the request body used in the '/process-payment' route
 interface InvoiceUpdateRequest {
   customer_id?: mongoose.Types.ObjectId;
   user_id?: mongoose.Types.ObjectId;
@@ -26,10 +27,10 @@ interface InvoiceUpdateRequest {
   }[];
 }
 
+// Create a Stripe instance with the secret key
 const stripe = new Stripe(process.env.STRIPESCECRET!);
 
-
-
+// Route for processing payments
 router.post('/process-payment', async (req, res) => {
   try {
     const { paymentMethodId, invoiceId } = req.body;
@@ -62,7 +63,7 @@ router.post('/process-payment', async (req, res) => {
   }
 });
 
-// @route   GET /invoices
+// Route to get all invoices
 router.get('/invoices', async (req: Request, res: Response) => {
   try {
     const invoices = await Invoice.find();
@@ -81,7 +82,7 @@ router.get('/invoices', async (req: Request, res: Response) => {
   }
 });
 
-// @route   GET /invoices
+// Route to get associated invoices, optionally filtered by employeeId
 router.get('/associatedInvoices', async (req: Request, res: Response) => {
   try {
     const { employeeId } = req.query;
@@ -108,13 +109,10 @@ router.get('/associatedInvoices', async (req: Request, res: Response) => {
   }
 });
 
-
-// @route   POST /invoices
+// Route to create a new invoice
 router.post('/invoices', async (req: Request, res: Response) => {
-
-
   try {
-
+    // Extract data from the request body
     const { customer_id, user_id, total, delivery_status, date, payment_status, payment_id, items } = req.body;
 
     // Check stock availability for each item
@@ -140,13 +138,7 @@ router.post('/invoices', async (req: Request, res: Response) => {
 
     const savedInvoice = await newInvoice.save();
 
-
-    //items
-    //prduct-> stock -> quanitiy
-    //stock_id and product_id -> unitserail
-    //unitserail avability and invoice_id
-    //invoiceitem create
-    // Deduct stock and update Unit_Serial
+    // Deduct stock and update Unit_Serial for each item
     const itemsPromises = items.map(async (item: { product_id: any; quantity: any; final_price: any; }) => {
       const { product_id, quantity, final_price } = item;
 
@@ -194,6 +186,7 @@ router.post('/invoices', async (req: Request, res: Response) => {
   }
 });
 
+// Route to get a specific invoice by ID
 router.get('/invoices/:id', async (req, res) => {
   try {
     // Find the invoice by ID and populate the related user and customer
@@ -222,134 +215,122 @@ router.get('/invoices/:id', async (req, res) => {
   }
 });
 
-// @route   PUT /invoices/:id
+// Route to update an existing invoice by ID
 router.put('/invoices/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { customer_id, user_id, total, delivery_status, date, payment_status, payment_id, items } = req.body;
+
+    // Check stock availability and existing invoice items
     for (const item of items) {
-      //used
       const existingInvoiceItem = await Invoice_Item.findOne({ invoice_id: id, product_id: item.product_id });
       const stockItem = await Stock.findOne({ product_id: item.product_id });
 
-      var tempQuantity=stockItem?.quantity ?? 0;
-      if(existingInvoiceItem){
-          tempQuantity= tempQuantity + existingInvoiceItem.quantity;
-      }    
+      var tempQuantity = stockItem?.quantity ?? 0;
+      if (existingInvoiceItem) {
+        tempQuantity = tempQuantity + existingInvoiceItem.quantity;
+      }
 
-      
-      if ((tempQuantity) < item.quantity) {
+      if (tempQuantity < item.quantity) {
         return res.status(400).json({
           message: `Insufficient stock for product ID ${item.product_id}`
         });
       }
-      
-    
-  }
-// Check if the invoice exists
-const existingInvoice = await Invoice.findById(id);
-  if (!existingInvoice) {
-    return res.status(404).json({ message: 'Invoice not found' });
-  }
+    }
 
-  existingInvoice.user_id = user_id;
-  existingInvoice.customer_id = customer_id;
-  existingInvoice.total = total;
-  existingInvoice.delivery_status = delivery_status;
-  existingInvoice.date = date;
-  existingInvoice.payment_status = payment_status;
-  if (payment_id) {
-    existingInvoice.payment_id = payment_id;
-  }
+    // Check if the invoice exists
+    const existingInvoice = await Invoice.findById(id);
+    if (!existingInvoice) {
+      return res.status(404).json({ message: 'Invoice not found' });
+    }
 
-  await existingInvoice.save();
+    // Update invoice fields
+    existingInvoice.user_id = user_id;
+    existingInvoice.customer_id = customer_id;
+    existingInvoice.total = total;
+    existingInvoice.delivery_status = delivery_status;
+    existingInvoice.date = date;
+    existingInvoice.payment_status = payment_status;
+    if (payment_id) {
+      existingInvoice.payment_id = payment_id;
+    }
 
-  //get unit_serail array associated with this invoice
-  //product -< stock reset
-  //unit serail -> reset
-  //delete EII
-  const existingInvoiceItems = await Invoice_Item.find({ invoice_id: id });
-  for (const EII of existingInvoiceItems) {
+    await existingInvoice.save();
 
-    const stockItem = await Stock.findOneAndUpdate(
-      { product_id: EII.product_id },
-      { $inc: { quantity: EII.quantity } },
-      { new: true }
-    );
-    for (let i = 0; i < EII.quantity; i++) {
-      const unitSerial = await Unit_Serial.findOneAndUpdate(
-        { stock_id: stockItem?._id, isAvailable: false, invoice_id: id },
-        { $set: { isAvailable: true, invoice_id: null } },
+    // Reset stock and Unit_Serial for existing invoice items
+    const existingInvoiceItems = await Invoice_Item.find({ invoice_id: id });
+    for (const EII of existingInvoiceItems) {
+      const stockItem = await Stock.findOneAndUpdate(
+        { product_id: EII.product_id },
+        { $inc: { quantity: EII.quantity } },
         { new: true }
       );
+      for (let i = 0; i < EII.quantity; i++) {
+        const unitSerial = await Unit_Serial.findOneAndUpdate(
+          { stock_id: stockItem?._id, isAvailable: false, invoice_id: id },
+          { $set: { isAvailable: true, invoice_id: null } },
+          { new: true }
+        );
+      }
+      await EII.deleteOne({ invoice_id: EII.id, product_id: EII.product_id });
     }
-    EII.deleteOne({ invoice_id: EII.id, product_id: EII.product_id });
-  }
 
-  //items
-  //prduct-> stock -> quanitiy
-  //stock_id and product_id -> unitserail
-  //unitserail avability and invoice_id
-  //invoiceitem create
-
-  for (const item of items) {
-    const stockItem = await Stock.findOne({ product_id: item.product_id });
-    if (!stockItem || stockItem.quantity < item.quantity) {
-      return res.status(400).json({
-        message: `Insufficient stock for product ID ${item.product_id}`
-      });
-    }
-  }
-
-  const itemsPromises = items.map(async (item: { product_id: any; quantity: any; final_price: any; }) => {
-    const { product_id, quantity, final_price } = item;
-
-    // Deduct the quantity from stock
-    const stockItem = await Stock.findOneAndUpdate(
-      { product_id: product_id },
-      { $inc: { quantity: -quantity } },
-      { new: true }
-    );
-
-    // Find a Unit_Serial for the product and mark as not available
-    for (let i = 0; i < quantity; i++) {
-      const unitSerial = await Unit_Serial.findOneAndUpdate(
-        { stock_id: stockItem?._id, isAvailable: true },
-        { $set: { isAvailable: false, invoice_id: id } },
-        { new: true }
-      );
-
-      if (!unitSerial) {
-        throw new Error(`No available unit serials for product ID ${product_id}`);
+    // Deduct stock and update Unit_Serial for new invoice items
+    for (const item of items) {
+      const stockItem = await Stock.findOne({ product_id: item.product_id });
+      if (!stockItem || stockItem.quantity < item.quantity) {
+        return res.status(400).json({
+          message: `Insufficient stock for product ID ${item.product_id}`
+        });
       }
     }
 
-    // Create and save the invoice item
-    const newItem = new Invoice_Item({
-      invoice_id: id,
-      product_id,
-      quantity,
-      final_price
+    const itemsPromises = items.map(async (item: { product_id: any; quantity: any; final_price: any; }) => {
+      const { product_id, quantity, final_price } = item;
+
+      // Deduct the quantity from stock
+      const stockItem = await Stock.findOneAndUpdate(
+        { product_id: product_id },
+        { $inc: { quantity: -quantity } },
+        { new: true }
+      );
+
+      // Find a Unit_Serial for the product and mark as not available
+      for (let i = 0; i < quantity; i++) {
+        const unitSerial = await Unit_Serial.findOneAndUpdate(
+          { stock_id: stockItem?._id, isAvailable: true },
+          { $set: { isAvailable: false, invoice_id: id } },
+          { new: true }
+        );
+
+        if (!unitSerial) {
+          throw new Error(`No available unit serials for product ID ${product_id}`);
+        }
+      }
+
+      // Create and save the invoice item
+      const newItem = new Invoice_Item({
+        invoice_id: id,
+        product_id,
+        quantity,
+        final_price
+      });
+
+      await newItem.save();
     });
 
-    newItem.save();
-  });
+    await Promise.all(itemsPromises);
 
-  await Promise.all(itemsPromises);
+    // Fetch the updated invoice items
+    const updatedInvoice = await Invoice_Item.find({ invoice_id: id });
 
-
-  const updatedInvoice = await Invoice_Item.find({ invoice_id: id });
-
-  res.status(201).json(updatedInvoice);
-
-}
-  catch (err) {
-  res.status(500).send('Server Error');
-}
-
+    res.status(201).json(updatedInvoice);
+  } catch (err) {
+    res.status(500).send('Server Error');
+  }
 });
 
-// @route   DELETE /invoices/:id
+// Route to delete an invoice by ID
 router.delete('/invoices/:id', async (req: Request, res: Response) => {
   try {
     await Invoice.findByIdAndDelete(req.params.id);
@@ -359,14 +340,12 @@ router.delete('/invoices/:id', async (req: Request, res: Response) => {
   }
 });
 
-// Express route to get monthly sales data for the line graph
+// Route to get monthly sales data for the line graph
 router.get('/monthly-sales', async (req: Request, res: Response) => {
   try {
     const { startDate, endDate } = req.query;
 
-    const match: any = {
-     
-    };
+    const match: any = {};
 
     if (startDate && endDate) {
       // If both startDate and endDate are provided, add date filtering
@@ -414,7 +393,6 @@ router.get('/monthly-sales', async (req: Request, res: Response) => {
     res.status(500).json({ message: err.message });
   }
 });
-
 
 router.get('/monthly-sales-by-category', async (req: Request, res: Response) => {
   try {

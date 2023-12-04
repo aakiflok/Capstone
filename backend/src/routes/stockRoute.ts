@@ -1,10 +1,11 @@
+// Import necessary modules and models
 import express, { Request, Response } from 'express';
 import { Stock } from './../models/StockModel';
 import { Product } from '../models/ProductModel';
 
 const router = express.Router();
 
-// Get all stock records
+// Route to get all stock records
 router.get('/stock', async (req: Request, res: Response) => {
   try {
     const stockRecords = await Stock.find();
@@ -17,8 +18,8 @@ router.get('/stock', async (req: Request, res: Response) => {
         product_name: product ? product.name : 'Product Not Found',
         quantity: stockItem.quantity,
         location: stockItem.location,
-        price: product ? product.price: 0,
-        discountinued: product ? product.discontinued : 'N/A',        
+        price: product ? product.price : 0,
+        discontinued: product ? product.discontinued : 'N/A',
       };
     }));
 
@@ -28,7 +29,7 @@ router.get('/stock', async (req: Request, res: Response) => {
   }
 });
 
-// Get a specific stock record by _id
+// Route to get a specific stock record by _id
 router.get('/stock/:id', async (req: Request, res: Response) => {
   try {
     const stockId = req.params.id;
@@ -38,24 +39,24 @@ router.get('/stock/:id', async (req: Request, res: Response) => {
     }
 
     const product = await Product.findById(stock.product_id);
-    
-    const enrichedStock=  {
+
+    const enrichedStock = {
       _id: stock._id,
       product_name: product ? product.name : 'Product Not Found',
-      product_id : product? product._id: 'Product Not Found',
+      product_id: product ? product._id : 'Product Not Found',
       quantity: stock.quantity,
       location: stock.location,
-      price: product ? product.price: 0,
-      discountinued: product ? product.discontinued : 'N/A',        
+      price: product ? product.price : 0,
+      discontinued: product ? product.discontinued : 'N/A',
     };
     res.status(200).json(enrichedStock);
-    
+
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Update a stock record
+// Route to update a stock record
 router.patch('/stock/:id', async (req: Request, res: Response) => {
   try {
     const stockId = req.params.id;
@@ -80,7 +81,7 @@ router.patch('/stock/:id', async (req: Request, res: Response) => {
   }
 });
 
-// Get quantity
+// Route to get quantity by productId
 router.get('/stock/quantity/:productId', async (req: Request, res: Response) => {
   try {
     const productId = req.params.productId;
@@ -97,7 +98,7 @@ router.get('/stock/quantity/:productId', async (req: Request, res: Response) => 
   }
 });
 
-// Delete a stock record
+// Route to delete a stock record by _id
 router.delete('/stock/:id', async (req: Request, res: Response) => {
   try {
     const stock = await Stock.findById(req.params.id);
@@ -112,6 +113,7 @@ router.delete('/stock/:id', async (req: Request, res: Response) => {
   }
 });
 
+// Route to fetch data for a stock bar chart
 router.get('/stock-bar-chart-data', async (req: Request, res: Response) => {
   try {
     // Aggregate stock quantities by product category

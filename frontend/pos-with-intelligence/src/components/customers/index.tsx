@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Navbar from '../navigation/nav';
+import Navbar from '../navigation/nav'; // Import the Navbar component
 import { Link, useNavigate } from 'react-router-dom';
 import { Container, Table, Button, FormControl } from 'react-bootstrap';
-import './customers.css';
+import './customers.css'; // Import CSS styles for this component
 
+// Define the Customer interface to describe the structure of customer data
 interface Customer {
   _id: string;
   first_name: string;
@@ -18,14 +19,17 @@ interface Customer {
 }
 
 const Customers: React.FC = () => {
+  // State variables to manage customer data and search query
   const [customerList, setCustomerList] = useState<Customer[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Create a navigation function
 
+  // Fetch customer data from the server when the component mounts
   useEffect(() => {
     fetchData();
   }, []);
 
+  // Function to fetch customer data from the server
   const fetchData = async () => {
     try {
       const response = await axios.get<Customer[]>('https://pos-crud.onrender.com/customers');
@@ -35,23 +39,27 @@ const Customers: React.FC = () => {
     }
   };
 
+  // Function to handle the "View" button click for a customer
   const handleViewClick = (customer: Customer) => {
-    navigate(`/customers/${customer._id}`);
+    navigate(`/customers/${customer._id}`); // Navigate to the customer's details page
   };
 
+  // Function to handle changes in the search input field
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
 
+  // Filter customers based on the search query
   const filteredCustomers = customerList.filter((customer) =>
-  (customer.first_name && customer.first_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-  (customer.last_name && customer.last_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-  (customer.email && customer.email.toLowerCase().includes(searchQuery.toLowerCase()))
-);
+    (customer.first_name && customer.first_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (customer.last_name && customer.last_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (customer.email && customer.email.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
+  // Render the component's JSX
   return (
     <>
-      <Navbar />
+      <Navbar /> {/* Render the Navbar component */}
       <Container>
         <Container className="d-flex justify-content-center mt-5">
           <Link to="/addCustomer" className="customer-tile-link">
@@ -110,4 +118,4 @@ const Customers: React.FC = () => {
   );
 };
 
-export default Customers;
+export default Customers; // Export the Customers component as the default export
